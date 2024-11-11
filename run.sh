@@ -16,7 +16,7 @@ if [ -z "$INPUT_DIRECTORY" ] || [ -z "$OUTPUT_DIRECTORY" ]; then
     exit 1
 fi
 
-# If the user has not provided the -o flag, set the default value of OUTPUT_MODE to json
+# If the user has not provided the -m flag, set the default value of OUTPUT_MODE to json
 if [ -z "$OUTPUT_MODE" ]; then
     OUTPUT_MODE="json"
 fi

@@ -1,5 +1,6 @@
 package com.pdstat.gqlextractor.repo;
 
+import com.pdstat.gqlextractor.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -22,7 +23,7 @@ public class GqlQueryRepository {
     private Map<String, String> gqlQueries = new HashMap<>();
 
     public void addGqlQuery(String query) {
-        if (query.contains("query ")) {
+        if (query.contains(Constants.Gql.QUERY)) {
             StringBuilder sb = new StringBuilder();
             Set<String> queryFragments = new HashSet<>();
             String lines[] = query.split("\n");
@@ -42,7 +43,7 @@ public class GqlQueryRepository {
                     }
                 }
 
-                if (line.contains("query ")) {
+                if (line.contains(Constants.Gql.QUERY)) {
                     queryName = line.strip().split(" ")[1];
                     if (queryName.contains("(")) {
                         queryName = queryName.split("\\(")[0];

@@ -1,6 +1,7 @@
 package com.pdstat.gqlextractor.model;
 
 import com.pdstat.gqlextractor.Constants;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,18 +25,19 @@ public class GqlRequest {
             if ((line.contains(Constants.Gql.QUERY) || line.contains(Constants.Gql.MUTATION) ||
                     line.contains(Constants.Gql.SUBSCRIPTION)) && line.contains("(")) {
                 String operationArgs = line.substring(line.indexOf("(") + 1, line.indexOf(")"));
-                String[] args = operationArgs.split(",");
+                String[] args = operationArgs.split("\\$");
                 for (String arg : args) {
-                    String[] argParts = arg.split(":");
-                    String argName = argParts[0].strip().replaceAll("\\$", "");
-                    String argType = argParts[1].strip();
-                    if (argType.contains("[")) {
-                        argType = argType.substring(argType.indexOf("[") + 1, argType.indexOf("]"));
-                        setVariable(argName, argType, true);
-                    } else {
-                        setVariable(argName, argType, false);
+                    if (!StringUtils.isEmpty(arg)) {
+                        String[] argParts = arg.split(":");
+                        String argName = argParts[0].strip().replaceAll("\\$", "");
+                        String argType = argParts[1].strip().replaceAll(",", "");
+                        if (argType.contains("[")) {
+                            argType = argType.substring(argType.indexOf("[") + 1, argType.indexOf("]"));
+                            setVariable(argName, argType, true);
+                        } else {
+                            setVariable(argName, argType, false);
+                        }
                     }
-
                 }
             }
         }
@@ -58,6 +60,9 @@ public class GqlRequest {
                 break;
             case "Float":
                 defaultValue = isList ? Arrays.asList(0.0) : 0.0;
+                break;
+            case "Long":
+                defaultValue = isList ? Arrays.asList(0L) : 0L;
                 break;
             case "Boolean":
                 defaultValue = isList ? Arrays.asList(false) : false;

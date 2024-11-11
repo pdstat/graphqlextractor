@@ -97,4 +97,22 @@ public class GqlRequestTest {
         assertEquals(0, gqlRequest.getVariables().get("memberId"));
     }
 
+    @Test
+    void testGqlRequestParamsNoSpaces() {
+        GqlRequest gqlRequest = new GqlRequest("AccountReonboardingRetrieveQuery", "query AccountReonboardingRetrieveQuery($input:OpenapiGetV1AccountInput" +
+                "$v1Context:V1ContextInput!)@tag(id:\\\"gql\\\")@hash(id:\\\"aad7352242\\\"){account:v1Account(input:" +
+                "$input v1Context:$v1Context)@params(expand:[]includeOnly:[\\\"id\\\" \\\"merchant_reonboarded_from\\\" " +
+                "\\\"merchants_reonboarded_to\\\"]fragments:[]nodeLookupMap:[{nodes:[\\\"id\\\" \\\"merchant_reonboarded_from\\\" " +
+                "\\\"merchants_reonboarded_to\\\"]parentPath:\\\"ROOT\\\"}]predicates:{})@rest(type:\\\"OpenapiAccount\\\" " +
+                "method:\\\"GET\\\" pathBuilder:$pathBuilder runtimePath:\\\"/v1/account\\\" queryName:\\\"account\\\")" +
+                "{id merchant_reonboarded_from merchants_reonboarded_to}}");
+
+        assertEquals("AccountReonboardingRetrieveQuery", gqlRequest.getOperationName());
+        assertEquals(2, gqlRequest.getVariables().size());
+        assertTrue(gqlRequest.getVariables().containsKey("input"));
+        assertTrue(gqlRequest.getVariables().get("input") instanceof Object);
+        assertTrue(gqlRequest.getVariables().containsKey("v1Context"));
+        assertTrue(gqlRequest.getVariables().get("v1Context") instanceof Object);
+    }
+
 }
