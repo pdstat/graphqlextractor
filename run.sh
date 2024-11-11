@@ -16,6 +16,11 @@ if [ -z "$INPUT_DIRECTORY" ] || [ -z "$OUTPUT_DIRECTORY" ]; then
     exit 1
 fi
 
+# If the user has not provided the -o flag, set the default value of OUTPUT_MODE to json
+if [ -z "$OUTPUT_MODE" ]; then
+    OUTPUT_MODE="json"
+fi
+
 # Export the variables as environment variables
 export INPUT_DIRECTORY
 export OUTPUT_DIRECTORY

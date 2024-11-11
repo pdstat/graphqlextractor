@@ -17,9 +17,9 @@ public class GqlFragmentsRepository {
     public void addGqlFragment(String fragment) {
         String line1 = fragment.split("\n")[0];
         if (line1.contains(Constants.Gql.FRAGMENT) &&
-                (!fragment.contains(Constants.Gql.QUERY) ||
-                        !fragment.contains(Constants.Gql.MUTATION) ||
-                        !fragment.contains(Constants.Gql.SUBSCRIPTION))) {
+                !(fragment.contains(Constants.Gql.QUERY) ||
+                        fragment.contains(Constants.Gql.MUTATION) ||
+                        fragment.contains(Constants.Gql.SUBSCRIPTION))) {
             line1 = line1.split(" on ")[0].strip();
             String fragmentName = line1.split(" ")[1];
             if (!gqlFragments.containsKey(fragmentName)) {
