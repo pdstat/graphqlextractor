@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  graphql-extractor:
+    build: .
+    volumes:
+      - "${INPUT_DIRECTORY}:/app/input"
+      - "${OUTPUT_DIRECTORY}:/app/output"
+    command: [
+      "--input-directory=/app/input",
+      "--output-directory=/app/output",
+      "--output-mode=${OUTPUT_MODE}",
+    ]
