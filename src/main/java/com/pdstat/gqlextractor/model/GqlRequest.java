@@ -10,7 +10,7 @@ import java.util.Map;
 public class GqlRequest {
 
     private String operationName;
-    private Map<String, Object> variables = new HashMap<>();
+    private final Map<String, Object> variables = new HashMap<>();
     private String query;
 
     public GqlRequest(String operationName, String gqlString) {

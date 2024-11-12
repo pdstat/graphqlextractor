@@ -18,7 +18,7 @@ public class GqlStringsRepository {
     private static final String JS_EXTENSION = ".js";
 
     private final GqlStringsExtractor gqlStringsExtractor;
-    private Set<String> gqlStrings = new HashSet<>();
+    private final Set<String> gqlStrings = new HashSet<>();
 
     public GqlStringsRepository(GqlStringsExtractor gqlStringsExtractor) {
         this.gqlStringsExtractor = gqlStringsExtractor;
