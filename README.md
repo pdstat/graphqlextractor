@@ -406,9 +406,15 @@ The JSON output for this would then look like the below:
 }
 ```
 
-Example usage:
+Example usage (script/docker):
 
 ```bash
  ./run.sh
 Usage: run.sh -i <input_directory> -o <output_directory> [-m <output_mode> (json, graphql or all)]
+```
+
+Example usage (java):
+
+```bash
+java -jar graphql-extractor-1.0.0.jar --input-directory=<input_directory> --output-directory=<output_directory> [--output-mode=<output_mode> (json, graphql or all)]
 ```
