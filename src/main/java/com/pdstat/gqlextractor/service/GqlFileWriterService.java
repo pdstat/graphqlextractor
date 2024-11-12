@@ -3,10 +3,7 @@ package com.pdstat.gqlextractor.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pdstat.gqlextractor.model.GqlRequest;
 import com.pdstat.gqlextractor.model.OutputMode;
-import com.pdstat.gqlextractor.repo.GqlFragmentsRepository;
-import com.pdstat.gqlextractor.repo.GqlMutationsRepository;
-import com.pdstat.gqlextractor.repo.GqlQueryRepository;
-import com.pdstat.gqlextractor.repo.GqlStringsRepository;
+import com.pdstat.gqlextractor.repo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,17 +26,21 @@ public class GqlFileWriterService {
 
     private final GqlQueryRepository gqlQueryRepository;
 
+    private final DefaultParamsRepository defaultParamsRepository;
+
     private final ObjectMapper mapper;
 
     public GqlFileWriterService(GqlStringsRepository gqlStringsRepository,
                                 GqlFragmentsRepository gqlFragmentsRepository,
                                 GqlQueryRepository gqlQueryRepository,
                                 GqlMutationsRepository gqlMutationsRepository,
+                                DefaultParamsRepository defaultParamsRepository,
                                 ObjectMapper mapper) {
         this.gqlStringsRepository = gqlStringsRepository;
         this.gqlFragmentsRepository = gqlFragmentsRepository;
         this.gqlQueryRepository = gqlQueryRepository;
         this.gqlMutationsRepository = gqlMutationsRepository;
+        this.defaultParamsRepository = defaultParamsRepository;
         this.mapper = mapper;
     }
 
@@ -78,7 +79,7 @@ public class GqlFileWriterService {
         String jsonFileName = outputDirectory + "/" + name + ".json";
         Path jsonFilePath = Paths.get(jsonFileName);
         logger.info("Writing json file: {}", jsonFilePath.getFileName());
-        Files.write(jsonFilePath, mapper.writeValueAsString(new GqlRequest(name, content)).getBytes());
+        Files.write(jsonFilePath, mapper.writeValueAsString(new GqlRequest(name, content, defaultParamsRepository)).getBytes());
     }
 
     private static void writeGqlFile(String name, String content, String outputDirectory) throws IOException {

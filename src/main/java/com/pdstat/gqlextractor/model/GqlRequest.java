@@ -1,6 +1,7 @@
 package com.pdstat.gqlextractor.model;
 
 import com.pdstat.gqlextractor.Constants;
+import com.pdstat.gqlextractor.repo.DefaultParamsRepository;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
@@ -13,7 +14,10 @@ public class GqlRequest {
     private final Map<String, Object> variables = new HashMap<>();
     private String query;
 
-    public GqlRequest(String operationName, String gqlString) {
+    private final DefaultParamsRepository defaultParamsRepository;
+
+    public GqlRequest(String operationName, String gqlString, DefaultParamsRepository defaultParamsRepository) {
+        this.defaultParamsRepository = defaultParamsRepository;
         initRequest(operationName, gqlString);
     }
 
@@ -47,8 +51,11 @@ public class GqlRequest {
     }
 
     private void setVariable(String argName, String argType, boolean isList) {
-        argType = getArgType(argType);
-        Object defaultValue = getDefaultValue(argType, isList);
+        Object defaultValue = defaultParamsRepository.getDefaultParam(argName);
+        if (defaultValue == null) {
+            argType = getArgType(argType);
+            defaultValue = getDefaultValue(argType, isList);
+        }
         variables.put(argName, defaultValue);
     }
 

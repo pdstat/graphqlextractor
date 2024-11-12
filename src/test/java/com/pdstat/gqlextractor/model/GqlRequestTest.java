@@ -1,11 +1,19 @@
 package com.pdstat.gqlextractor.model;
 
+import com.pdstat.gqlextractor.repo.DefaultParamsRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(MockitoExtension.class)
 public class GqlRequestTest {
+
+    @Mock
+    private DefaultParamsRepository defaultParamsRepository;
 
     @Test
     void testGqlRequestNoParams() {
@@ -28,7 +36,7 @@ public class GqlRequestTest {
                 "      ...CountryFields\n" +
                 "    }\n" +
                 "  }\n" +
-                "}");
+                "}", defaultParamsRepository);
         assertEquals("fragment CountryFields on Country {\n  code\n  name\n  mandatoryPostalCode\n  regions {" +
                 "\n    code\n    name\n  }\n}\nquery CountriesSupported {\n  bssConfiguration {\n    addressFormMode\n" +
                 "    shippingCountries: supportedCountries(context: \"shipping\") {\n      ...CountryFields\n    }\n" +
@@ -52,7 +60,7 @@ public class GqlRequestTest {
                 "      termsId\n" +
                 "    }\n" +
                 "  }\n" +
-                "}");
+                "}", defaultParamsRepository);
         assertEquals("mutation ConnectBssToLyft($jwt: String!) {\n  connectBssToLyft(jwt: $jwt) {\n    id\n" +
                         "    hasLinkedBssAccount\n    migration {\n      id\n      needsToSeePrompt\n    }\n" +
                         "    termsToAgreeTo {\n      termsId\n    }\n  }\n}",
@@ -77,7 +85,7 @@ public class GqlRequestTest {
                 "      }\n" +
                 "    }\n" +
                 "  }\n" +
-                "}");
+                "}", defaultParamsRepository);
         assertEquals("query BssPurchasePageCpaPayload($params: SubscriptionTypesParams, $queryString: String, " +
                         "$autoRenew: Boolean, $memberId: Int) {\n  currentMarket {\n    " +
                         "subscriptionTypes(params: $params, memberId: $memberId) {\n      id\n      " +
@@ -105,7 +113,7 @@ public class GqlRequestTest {
                 "\\\"merchants_reonboarded_to\\\"]fragments:[]nodeLookupMap:[{nodes:[\\\"id\\\" \\\"merchant_reonboarded_from\\\" " +
                 "\\\"merchants_reonboarded_to\\\"]parentPath:\\\"ROOT\\\"}]predicates:{})@rest(type:\\\"OpenapiAccount\\\" " +
                 "method:\\\"GET\\\" pathBuilder:$pathBuilder runtimePath:\\\"/v1/account\\\" queryName:\\\"account\\\")" +
-                "{id merchant_reonboarded_from merchants_reonboarded_to}}");
+                "{id merchant_reonboarded_from merchants_reonboarded_to}}", defaultParamsRepository);
 
         assertEquals("AccountReonboardingRetrieveQuery", gqlRequest.getOperationName());
         assertEquals(2, gqlRequest.getVariables().size());
