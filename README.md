@@ -376,13 +376,13 @@ The collection of JSON files can then be used as wordlists for fuzzing GraphQL e
 
 Parameter values are defaulted like so (lists of types are also supported)
 
-| Type    | Value     |
-|---------|-----------|
-| Int     | 0         |
-| Long    | 0         |
-| Float   | 0.0       |
-| String  | ""        |
-| Boolean | 0.0       |
+| Type    | Value       |
+|---------|-------------|
+| Int     | 0           |
+| Long    | 0           |
+| Float   | 0.0         |
+| String  | ""          |
+| Boolean | false       |
 | Other   | {} (Object) |
 
 It's possible to override known parameter names with default values by placing a `defaultParams.json` file in the same directory as the `input-directory`, for example:
