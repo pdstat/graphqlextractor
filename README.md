@@ -409,11 +409,11 @@ The JSON output for this would then look like the below:
 Example usage (java) extract from local JS files:
 
 ```bash
-java -jar gqlextractor-1.0.0.jar --input-directory=<input_directory> --output-directory=<output_directory> [--output-mode=<output_mode> (json, graphql or all)] [--default-params=<default_params>]
+java -jar gqlextractor-1.0.0.jar --input-directory=<input_directory> --output-directory=<output_directory> [--output-mode=<output_mode> (json, graphql or all)] [--default-params=<default_params_file_path>]
 ```
 
 Example usage (java) extract from wordlist of URLs:
 
 ```bash
-java -jar gqlextractor-1.0.0.jar --input-urls=<input_urls> --output-directory=<output_directory> [--output-mode=<output_mode> (json, graphql or all)] [--default-params=<default_params>]
+java -jar gqlextractor-1.0.0.jar --input-urls=<input_urls_wordlist_path> --output-directory=<output_directory> [--output-mode=<output_mode> (json, graphql or all)] [--default-params=<default_params_file_path>]
 ```
