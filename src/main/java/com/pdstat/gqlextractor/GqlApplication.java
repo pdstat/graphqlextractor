@@ -31,19 +31,20 @@ public class GqlApplication implements CommandLineRunner {
             logger.info("GqlExtractor is an application that extracts .graphql and .json files from a directory of javascript files that contain GraphQL strings.");
             logger.info("The application requires the following arguments:");
             logger.info("  --input-directory=<input-directory> : The directory containing the javascript files with embedded GQL strings.");
+            logger.info("  --input-urls=<input-urls> : The path to a wordlist of urls to scan.");
+            logger.info("  --default-params=<default-params> : The path to a json file of default parameter values.");
             logger.info("  --output-directory=<output-directory> : The directory where the generated GraphQL files will be saved.");
             logger.info("  --output-mode=<output-mode> : The output mode for the generated files. Possible values are 'json', 'graphql' and 'all'. The default value is 'json'.");
             System.exit(0);
         }
 
-        if (!appArgs.containsOption(Constants.Arguments.INPUT_DIRECTORY)) {
-            logger.error("Input directory not provided. Exiting application. Use the --help option for more information.");
+        if (!appArgs.containsOption(Constants.Arguments.INPUT_DIRECTORY) && !appArgs.containsOption(Constants.Arguments.INPUT_URLS)) {
+            logger.error("--input-directory and --input-urls not provided. Exiting application. Use the --help option for more information.");
             System.exit(1);
         }
 
-        String inputDirectory = appArgs.getOptionValues(Constants.Arguments.INPUT_DIRECTORY).get(0);
         if (!appArgs.containsOption(Constants.Arguments.OUTPUT_DIRECTORY)) {
-            logger.error("Output directory not provided. Exiting application. Use the --help option for more information.");
+            logger.error("--output-directory not provided. Exiting application. Use the --help option for more information.");
             System.exit(1);
         }
         String outputDirectory = appArgs.getOptionValues(Constants.Arguments.OUTPUT_DIRECTORY).get(0);
@@ -51,6 +52,6 @@ public class GqlApplication implements CommandLineRunner {
         if (appArgs.containsOption(Constants.Arguments.OUTPUT_MODE)) {
             outputMode = OutputMode.fromMode(appArgs.getOptionValues(Constants.Arguments.OUTPUT_MODE).get(0).toLowerCase());
         }
-        gqlFileWriterService.writeGqlFiles(inputDirectory, outputDirectory, outputMode);
+        gqlFileWriterService.writeGqlFiles(outputDirectory, outputMode);
     }
 }

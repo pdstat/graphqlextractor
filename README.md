@@ -406,15 +406,14 @@ The JSON output for this would then look like the below:
 }
 ```
 
-Example usage (script/docker):
+Example usage (java) extract from local JS files:
 
 ```bash
- ./run.sh
-Usage: run.sh -i <input_directory> -o <output_directory> [-m <output_mode> (json, graphql or all)]
+java -jar gqlextractor-1.0.0.jar --input-directory=<input_directory> --output-directory=<output_directory> [--output-mode=<output_mode> (json, graphql or all)] [--default-params=<default_params>]
 ```
 
-Example usage (java):
+Example usage (java) extract from wordlist of URLs:
 
 ```bash
-java -jar gqlextractor-1.0.0.jar --input-directory=<input_directory> --output-directory=<output_directory> [--output-mode=<output_mode> (json, graphql or all)]
+java -jar gqlextractor-1.0.0.jar --input-urls=<input_urls> --output-directory=<output_directory> [--output-mode=<output_mode> (json, graphql or all)] [--default-params=<default_params>]
 ```

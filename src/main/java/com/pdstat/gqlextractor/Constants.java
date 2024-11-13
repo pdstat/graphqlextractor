@@ -10,6 +10,8 @@ public class Constants {
     }
     public interface Arguments {
         String HELP = "help";
+        String INPUT_URLS = "input-urls";
+        String DEFAULT_PARAMS = "default-params";
         String INPUT_DIRECTORY = "input-directory";
         String OUTPUT_DIRECTORY = "output-directory";
         String OUTPUT_MODE = "output-mode";

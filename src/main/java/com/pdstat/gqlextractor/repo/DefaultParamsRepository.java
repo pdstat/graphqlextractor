@@ -19,7 +19,6 @@ import java.util.Map;
 @Repository
 public class DefaultParamsRepository {
 
-    private static final String DEFAULT_PARAMS_FILE = "defaultParams.json";
     private static final Logger logger = LoggerFactory.getLogger(DefaultParamsRepository.class);
     private Map<String, Object> defaultParams;
     private final ObjectMapper mapper;
@@ -32,14 +31,17 @@ public class DefaultParamsRepository {
 
     @PostConstruct
     void init() {
-        logger.info("Initializing default params repository");
-        String inputDirectory = appArgs.getOptionValues(Constants.Arguments.INPUT_DIRECTORY).get(0);
-        Path defaultParamsPath = Paths.get(inputDirectory, DEFAULT_PARAMS_FILE);
-        TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
-        try {
-            defaultParams = mapper.readValue(defaultParamsPath.toFile(), typeRef);
-        } catch (IOException e) {
-            logger.error("Error reading default params file, skipping");
+        if (appArgs.containsOption(Constants.Arguments.DEFAULT_PARAMS)) {
+            logger.info("Initializing default params repository");
+            String defaultParamsFile = appArgs.getOptionValues(Constants.Arguments.DEFAULT_PARAMS).get(0);
+            Path defaultParamsPath = Paths.get(defaultParamsFile);
+            TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+            };
+            try {
+                defaultParams = mapper.readValue(defaultParamsPath.toFile(), typeRef);
+            } catch (IOException e) {
+                logger.error("Error reading default params file, skipping");
+            }
         }
     }
 

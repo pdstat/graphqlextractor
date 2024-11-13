@@ -44,8 +44,8 @@ public class GqlFileWriterService {
         this.mapper = mapper;
     }
 
-    public void writeGqlFiles(String scanDirectory, String outputDirectory, OutputMode outputMode) {
-        initGqlRepositories(scanDirectory);
+    public void writeGqlFiles(String outputDirectory, OutputMode outputMode) {
+        initGqlRepositories();
         writeGqlQueries(outputDirectory, outputMode);
         writeGqlMutations(outputDirectory, outputMode);
         logger.info("Finished extracting GQL files");
@@ -89,8 +89,8 @@ public class GqlFileWriterService {
         Files.write(gqlFilePath, content.getBytes());
     }
 
-    private void initGqlRepositories(String scanDirectory) {
-        Set<String> gqlStrings = gqlStringsRepository.getGqlStrings(scanDirectory);
+    private void initGqlRepositories() {
+        Set<String> gqlStrings = gqlStringsRepository.getGqlStrings();
         gqlStrings.forEach(gqlFragmentsRepository::addGqlFragment);
         gqlStrings.forEach(gqlQueryRepository::addGqlQuery);
         gqlStrings.forEach(gqlMutationsRepository::addGqlMutation);
