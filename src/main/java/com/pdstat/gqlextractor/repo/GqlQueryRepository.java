@@ -36,7 +36,7 @@ public class GqlQueryRepository {
                     }
                     if (!queryFragments.contains(fragmentName)) {
                         String fragment = gqlFragmentsRepository.getGqlFragment(fragmentName);
-                        if (fragment != null) {
+                        if (fragment != null && sb.indexOf(fragment) == -1) {
                             sb.append(fragment).append("\n");
                             queryFragments.add(fragmentName);
                         }

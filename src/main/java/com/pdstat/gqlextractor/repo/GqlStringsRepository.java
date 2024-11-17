@@ -48,17 +48,23 @@ public class GqlStringsRepository {
             // For each URL in the inputUrls text file, get the content and extract the GQL strings using the rest template and the gqlStringsExtractor
             try {
                 Files.lines(Paths.get(inputUrls))
-                        .forEach(url -> {
-                            logger.info("Processing URL: {}", url);
-                            String content = restTemplate.getForObject(url, String.class);
-                            gqlStrings.addAll(gqlStringsExtractor.extract(content));
-                        });
+                        .forEach(url -> processUrl(url));
             } catch (IOException e) {
                 logger.error("Error reading input urls: {}", inputUrls);
             }
 
         }
         return gqlStrings;
+    }
+
+    private void processUrl(String url) {
+        try {
+            logger.info("Processing URL: {}", url);
+            String content = restTemplate.getForObject(url, String.class);
+            gqlStrings.addAll(gqlStringsExtractor.extract(content));
+        } catch (Exception e) {
+            logger.error("Error reading URL: {}", url);
+        }
     }
 
     private void processFile(String filePath) {
