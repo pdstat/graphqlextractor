@@ -5,10 +5,17 @@ import com.pdstat.gqlextractor.extractor.GqlStringsExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,7 +29,6 @@ public class GqlStringsRepository {
     private static final String JS_EXTENSION = ".js";
     private final GqlStringsExtractor gqlStringsExtractor;
     private final ApplicationArguments appArgs;
-    private final RestTemplate restTemplate = new RestTemplate();
     private final Set<String> gqlStrings = new HashSet<>();
 
     public GqlStringsRepository(GqlStringsExtractor gqlStringsExtractor, ApplicationArguments appArgs) {
@@ -60,7 +66,8 @@ public class GqlStringsRepository {
     private void processUrl(String url) {
         try {
             logger.info("Processing URL: {}", url);
-            String content = restTemplate.getForObject(url, String.class);
+            WebClient client = WebClient.builder().codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(20 * 1024 * 1024)).baseUrl(url).build();
+            String content = client.get().retrieve().bodyToMono(String.class).block();
             gqlStrings.addAll(gqlStringsExtractor.extract(content));
         } catch (Exception e) {
             logger.error("Error reading URL: {}", url);

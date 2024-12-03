@@ -76,10 +76,16 @@ public class GqlFileWriterService {
     }
 
     private void writeJsonFile(String name, String content, String outputDirectory) throws IOException {
-        String jsonFileName = outputDirectory + "/" + name + ".json";
-        Path jsonFilePath = Paths.get(jsonFileName);
-        logger.info("Writing json file: {}", jsonFilePath.getFileName());
-        Files.write(jsonFilePath, mapper.writeValueAsString(new GqlRequest(name, content, defaultParamsRepository)).getBytes());
+        try {
+           String jsonFileName = outputDirectory + "/" + name + ".json";
+           Path jsonFilePath = Paths.get(jsonFileName);
+
+           GqlRequest gqlRequest = new GqlRequest(name, content, defaultParamsRepository);
+           logger.info("Writing json file: {}", jsonFilePath.getFileName());
+           Files.write(jsonFilePath, mapper.writeValueAsString(gqlRequest).getBytes());
+        } catch (Exception e) {
+            logger.warn("Error writing json file: {}",name);
+        }
     }
 
     private static void writeGqlFile(String name, String content, String outputDirectory) throws IOException {

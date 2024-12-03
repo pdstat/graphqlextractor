@@ -53,5 +53,6 @@ public class GqlApplication implements CommandLineRunner {
             outputMode = OutputMode.fromMode(appArgs.getOptionValues(Constants.Arguments.OUTPUT_MODE).get(0).toLowerCase());
         }
         gqlFileWriterService.writeGqlFiles(outputDirectory, outputMode);
+        System.exit(0);
     }
 }

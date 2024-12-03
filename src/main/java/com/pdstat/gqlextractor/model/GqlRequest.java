@@ -28,9 +28,10 @@ public class GqlRequest {
         for (String line : lines) {
             if ((line.contains(Constants.Gql.QUERY) || line.contains(Constants.Gql.MUTATION) ||
                     line.contains(Constants.Gql.SUBSCRIPTION)) && line.contains("(")) {
-                String operationArgs = line.substring(line.indexOf("(") + 1, line.indexOf(")"));
+                String operationArgs = gqlString.substring(gqlString.indexOf("(") + 1, gqlString.indexOf(")"));
                 String[] args = operationArgs.split("\\$");
                 for (String arg : args) {
+                    arg = arg.strip();
                     if (!StringUtils.isEmpty(arg)) {
                         String[] argParts = arg.split(":");
                         String argName = argParts[0].strip().replaceAll("\\$", "");
