@@ -6,6 +6,8 @@ import java.util.Map;
 public enum OutputMode {
 
     GQL("graphql"),
+    FIELDS("fields"),
+    REPORT("report"),
     ALL("all"),
     JSON("json");
 
@@ -15,6 +17,8 @@ public enum OutputMode {
         BY_MODE.put(GQL.mode, GQL);
         BY_MODE.put(ALL.mode, ALL);
         BY_MODE.put(JSON.mode, JSON);
+        BY_MODE.put(FIELDS.mode, FIELDS);
+        BY_MODE.put(REPORT.mode, REPORT);
     }
 
     private final String mode;
@@ -23,7 +27,7 @@ public enum OutputMode {
         this.mode = mode;
     }
 
-    public static final OutputMode fromMode(String mode) {
+    public static OutputMode fromMode(String mode) {
         OutputMode outputMode = BY_MODE.get(mode);
         if (outputMode == null) {
             return JSON;
