@@ -1,5 +1,6 @@
 package com.pdstat.gqlextractor.service;
 
+import com.pdstat.gqlextractor.Constants;
 import com.pdstat.gqlextractor.repo.GqlFieldRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,14 +25,18 @@ public class GqlFieldWordListWriterService {
     }
 
     public void writeFieldsFile(String outputDirectory) {
-        logger.info("Writing GQL fields file");
-        String fieldsFileName = outputDirectory + "/graphql-fields.txt";
+        logger.info("Writing GQL unique fields file");
+        String fieldsFileName = outputDirectory + "/" + Constants.Output.DIRECTORIES.WORDLIST + "/"
+                + Constants.Output.FILES.FIELDS_FILE;
         Path fieldsFilePath = Paths.get(fieldsFileName);
         List<String> gqlFields = this.gqlFieldRepository.getGqlFields();
-        try (BufferedWriter writer = Files.newBufferedWriter(fieldsFilePath)) {
-            for (String field : gqlFields) {
-                writer.write(field);
-                writer.newLine();
+        try {
+            Files.createDirectories(fieldsFilePath.getParent());
+            try (BufferedWriter writer = Files.newBufferedWriter(fieldsFilePath)) {
+                for (String field : gqlFields) {
+                    writer.write(field);
+                    writer.newLine();
+                }
             }
         } catch (IOException e) {
             logger.error("Error writing fields file: {}", fieldsFileName, e);

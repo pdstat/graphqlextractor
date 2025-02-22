@@ -1,5 +1,6 @@
 package com.pdstat.gqlextractor.service;
 
+import com.pdstat.gqlextractor.Constants;
 import com.pdstat.gqlextractor.repo.GqlSchemaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,16 +28,20 @@ public class GqlSchemaFieldPathWriterService {
 
     public void writeSchemaFieldPaths(String outputDirectory, String inputSchema, String searchField, int maxDepth) {
         logger.info("Finding schema field paths for field: {}", searchField);
-        String schemaFieldPathsFileName = outputDirectory + "/graphql-schema-field-paths.txt";
+        String schemaFieldPathsFileName = outputDirectory + "/" + Constants.Output.DIRECTORIES.SCHEMA_FIELD_PATHS + "/"
+                + searchField + Constants.Output.FILES.FIELD_PATHS;
         Path schemaFieldPathsFilePath = Paths.get(schemaFieldPathsFileName);
-        List<String> gqlSchemaFieldPaths =gqlSchemaPathFinder
+        List<String> gqlSchemaFieldPaths = gqlSchemaPathFinder
                 .findFieldPaths(gqlSchemaRepository.getGqlSchema(inputSchema), searchField, maxDepth);
-        try (BufferedWriter writer = Files.newBufferedWriter(schemaFieldPathsFilePath)) {
-            logger.info("Writing GQL schema fields report file");
-            for (String fieldPath : gqlSchemaFieldPaths) {
-                logger.info(fieldPath);
-                writer.write(fieldPath);
-                writer.newLine();
+        try {
+            Files.createDirectories(schemaFieldPathsFilePath.getParent());
+            try (BufferedWriter writer = Files.newBufferedWriter(schemaFieldPathsFilePath)) {
+                logger.info("Writing GQL schema fields report file");
+                for (String fieldPath : gqlSchemaFieldPaths) {
+                    logger.info(fieldPath);
+                    writer.write(fieldPath);
+                    writer.newLine();
+                }
             }
         } catch (IOException e) {
             logger.error("Error writing schema field paths file: {}", schemaFieldPathsFileName, e);

@@ -63,7 +63,7 @@ public class GqlSchemaRepository {
         Path schemaFilePath = Path.of(inputSchema);
         if (schemaFilePath.toFile().exists()) {
             try {
-                String schema = Files.readAllBytes(schemaFilePath).toString();
+                String schema = new String(Files.readAllBytes(schemaFilePath));
                 Map<String, Object> responseMap = mapper.readValue(schema, new TypeReference<HashMap<String, Object>>() {
                 });
                 if (responseMap.containsKey("data") && responseMap.get("data") != null) {
@@ -73,7 +73,7 @@ public class GqlSchemaRepository {
                     System.exit(1);
                 }
             } catch (Exception e) {
-                logger.error("Error reading schema file: {}", e.getMessage());
+                logger.error("Error reading schema file", e);
                 System.exit(1);
             }
         } else {
@@ -114,7 +114,7 @@ public class GqlSchemaRepository {
                     System.exit(1);
                 }
             } catch (JsonProcessingException e) {
-                logger.error("Introspection query failed: {}", e.getMessage());
+                logger.error("Introspection query failed: {}", e.getMessage(), e);
                 System.exit(1);
             }
         } else {

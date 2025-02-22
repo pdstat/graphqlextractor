@@ -55,7 +55,7 @@ public class GqlPathFinder {
 
             if (entry.getKey().equals(targetField)) {
                 Collections.reverse(newPath);
-                paths.add(String.join(" → ", newPath));
+                paths.add(String.join(" -> ", newPath));
             }
 
             if (entry.getValue() instanceof Map) {
@@ -63,15 +63,6 @@ public class GqlPathFinder {
             }
         }
         return paths;
-    }
-
-    public List<String> findFieldPaths(String graphqlString, String targetField) {
-        try {
-            Map<String, Object> gqlStringMap = graphqlToMap(graphqlString);
-            return findFieldPaths(gqlStringMap, targetField);
-        } catch (InvalidSyntaxException ignored) {
-            return new ArrayList<>();
-        }
     }
 
     public List<String> findFieldPaths(Document graphqlDocument, String targetField) {

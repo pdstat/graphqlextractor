@@ -49,7 +49,7 @@ public class GqlDocumentRepository {
                         paths.filter(Files::isRegularFile)
                                 .forEach(filePath -> processJavascriptFile(filePath.toString()));
                     } catch (IOException e) {
-                        logger.error("Error reading directory: {}", scanDirectory);
+                        logger.error("Error reading directory: {}", scanDirectory, e);
                     }
                 }
 
@@ -58,7 +58,7 @@ public class GqlDocumentRepository {
                     try (Stream<String> urls = Files.lines(Paths.get(inputUrls))) {
                         urls.forEach(this::processUrl);
                     } catch (IOException e) {
-                        logger.error("Error reading input urls: {}", inputUrls);
+                        logger.error("Error reading input urls: {}", inputUrls, e);
                     }
                 }
             } else if (appArgs.containsOption(Constants.Arguments.INPUT_OPERATIONS)) {
@@ -67,7 +67,7 @@ public class GqlDocumentRepository {
                     paths.filter(Files::isRegularFile)
                             .forEach(filePath -> processGqlOperationsFile(filePath.toString()));
                 } catch (IOException e) {
-                    logger.error("Error reading directory: {}", scanDirectory);
+                    logger.error("Error reading directory: {}", scanDirectory, e);
                 }
             }
         }
@@ -85,7 +85,7 @@ public class GqlDocumentRepository {
             String content = client.get().retrieve().bodyToMono(String.class).block();
             gqlDocuments.addAll(gqlDocumentExtractor.extract(content));
         } catch (Exception e) {
-            logger.error("Error reading URL: {}", url);
+            logger.error("Error reading URL: {}", url, e);
         }
     }
 
@@ -97,7 +97,7 @@ public class GqlDocumentRepository {
                 String content = new String(Files.readAllBytes(gqlFilePath));
                 gqlDocuments.add(Parser.parse(content));
             } catch (IOException | InvalidSyntaxException e) {
-                logger.error("Error reading graphql operation file: {}", gqlFilePath.getFileName());
+                logger.error("Error reading graphql operation file: {}", gqlFilePath.getFileName(), e);
             }
 
         }
@@ -111,7 +111,7 @@ public class GqlDocumentRepository {
                 String content = new String(Files.readAllBytes(jsFilePath));
                 gqlDocuments.addAll(gqlDocumentExtractor.extract(content));
             } catch (IOException e) {
-                logger.error("Error reading javascript file: {}", jsFilePath.getFileName());
+                logger.error("Error reading javascript file: {}", jsFilePath.getFileName(), e);
             }
         }
     }

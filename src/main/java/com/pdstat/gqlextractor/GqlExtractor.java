@@ -37,7 +37,7 @@ public class GqlExtractor implements CommandLineRunner {
             logger.info("  --depth=<search-depth> : Depth of the field path search, defaults to 10 if not specified.");
             logger.info("  --default-params=<default-params> : The path to a json file of default parameter values.");
             logger.info("  --output-directory=<output-directory> : The directory where the generated GraphQL files will be saved.");
-            logger.info("  --output-mode=<output-mode> : The output mode for the generated files. Possible values are 'json', 'graphql', 'fields', 'report' and 'all'. The default value is 'json'.");
+            logger.info("  --output-mode=<output-mode> : The output mode for the generated files. Possible values are 'requests', 'operations', 'fields', 'paths' and 'all'. The default value is 'json'.");
             System.exit(0);
         }
 

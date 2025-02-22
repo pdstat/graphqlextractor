@@ -68,13 +68,13 @@ public class GqlSchemaPathFinder {
                 newPath.add(fieldName);
 
                 // Generate a unique key for path tracking to avoid cycles
-                String pathKey = String.join(" → ", newPath);
+                String pathKey = String.join(" -> ", newPath);
                 if (visitedPaths.contains(pathKey)) continue;
                 visitedPaths.add(pathKey);
 
                 if (fieldName.equals(targetField)) {
                     Collections.reverse(newPath);
-                    paths.add(String.join(" → ", newPath));
+                    paths.add(String.join(" -> ", newPath));
                 } else if (fieldTypes.containsKey(nextType)) {
                     List<String> nextPath = new ArrayList<>(newPath);
                     nextPath.add(nextType);

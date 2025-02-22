@@ -49,7 +49,7 @@ public class GqlDocumentExtractor {
             documents.addAll(extractDocumentsWithVisitor(javascript, documents,
                     resourceService.readResourceFileContent(gqlStringsVisitorResource)));
         } catch (IOException e) {
-            logger.error("Error extracting documents from javascript");
+            logger.error("Error extracting documents from javascript", e);
         }
 
         return documents;
@@ -84,7 +84,7 @@ public class GqlDocumentExtractor {
             try {
                 docs.add(gqlParser.parseDocument(doc));
             } catch (InvalidSyntaxException e) {
-                logger.error("Error parsing document: {}", doc);
+                logger.error("Error parsing document: {}", doc, e);
             }
         }
     }

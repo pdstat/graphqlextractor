@@ -5,20 +5,20 @@ import java.util.Map;
 
 public enum OutputMode {
 
-    GQL("graphql"),
+    OPERATIONS("operations"),
     FIELDS("fields"),
-    REPORT("report"),
+    PATHS("paths"),
     ALL("all"),
-    JSON("json");
+    REQUESTS("requests");
 
     private static final Map<String, OutputMode> BY_MODE = new HashMap<>();
 
     static {
-        BY_MODE.put(GQL.mode, GQL);
+        BY_MODE.put(OPERATIONS.mode, OPERATIONS);
         BY_MODE.put(ALL.mode, ALL);
-        BY_MODE.put(JSON.mode, JSON);
+        BY_MODE.put(REQUESTS.mode, REQUESTS);
         BY_MODE.put(FIELDS.mode, FIELDS);
-        BY_MODE.put(REPORT.mode, REPORT);
+        BY_MODE.put(PATHS.mode, PATHS);
     }
 
     private final String mode;
@@ -30,7 +30,7 @@ public enum OutputMode {
     public static OutputMode fromMode(String mode) {
         OutputMode outputMode = BY_MODE.get(mode);
         if (outputMode == null) {
-            return JSON;
+            return REQUESTS;
         }
         return outputMode;
     }

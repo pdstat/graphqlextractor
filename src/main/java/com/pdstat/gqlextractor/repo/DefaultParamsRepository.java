@@ -40,7 +40,7 @@ public class DefaultParamsRepository {
             try {
                 defaultParams = mapper.readValue(defaultParamsPath.toFile(), typeRef);
             } catch (IOException e) {
-                logger.error("Error reading default params file, skipping");
+                logger.error("Error reading default params file, skipping", e);
             }
         }
     }

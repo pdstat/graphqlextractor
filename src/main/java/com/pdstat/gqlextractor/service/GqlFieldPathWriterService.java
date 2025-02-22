@@ -1,5 +1,6 @@
 package com.pdstat.gqlextractor.service;
 
+import com.pdstat.gqlextractor.Constants;
 import com.pdstat.gqlextractor.repo.GqlOperationsRepository;
 import graphql.language.Document;
 import org.slf4j.Logger;
@@ -29,24 +30,28 @@ public class GqlFieldPathWriterService {
 
     public void writeFieldsReport(String outputDirectory, String searchField) {
         logger.info("Finding field paths for field: {}", searchField);
-        String fieldsFileName = outputDirectory + "/graphql-field-paths-report.txt";
+        String fieldsFileName = outputDirectory + "/" + Constants.Output.DIRECTORIES.FIELD_PATHS + "/" + searchField +
+                Constants.Output.FILES.FIELD_PATHS;
         Path fieldsFilePath = Paths.get(fieldsFileName);
         Set<String> fieldPaths = new HashSet<>();
-        for (Document document: gqlOperationsRepository.getGqlOperations().values()) {
+        for (Document document : gqlOperationsRepository.getGqlOperations().values()) {
             fieldPaths.addAll(gqlPathFinder.findFieldPaths(document, searchField));
         }
         List<String> sortedFieldPaths = new ArrayList<>(fieldPaths);
         Collections.sort(sortedFieldPaths);
 
-        try (BufferedWriter writer = Files.newBufferedWriter(fieldsFilePath)) {
-            logger.info("Writing GQL operations fields report file");
-            for (String field : sortedFieldPaths) {
-                logger.info(field);
-                writer.write(field);
-                writer.newLine();
+        try {
+            Files.createDirectories(fieldsFilePath.getParent());
+            try (BufferedWriter writer = Files.newBufferedWriter(fieldsFilePath)) {
+                logger.info("Writing GQL operations fields report file");
+                for (String field : sortedFieldPaths) {
+                    logger.info(field);
+                    writer.write(field);
+                    writer.newLine();
+                }
             }
         } catch (IOException e) {
-            logger.error("Error writing fields file: {}", fieldsFileName, e);
+            logger.error("Error writing field paths file: {}", fieldsFileName, e);
         }
 
     }

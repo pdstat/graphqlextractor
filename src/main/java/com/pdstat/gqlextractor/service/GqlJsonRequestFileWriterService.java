@@ -1,6 +1,7 @@
 package com.pdstat.gqlextractor.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pdstat.gqlextractor.Constants;
 import com.pdstat.gqlextractor.model.GqlRequest;
 import com.pdstat.gqlextractor.repo.GqlOperationsRepository;
 import graphql.language.Document;
@@ -33,13 +34,15 @@ public class GqlJsonRequestFileWriterService {
     public void writeJsonRequestFiles(String outputDirectory)  {
         for (Document document : gqlOperationsRepository.getGqlOperations().values()) {
             GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
-            String jsonFileName = outputDirectory + "/" + gqlRequest.getOperationName() + ".json";
+            String jsonFileName = outputDirectory + "/" + Constants.Output.DIRECTORIES.REQUESTS + "/"
+                    + gqlRequest.getOperationName() + ".json";
             Path jsonFilePath = Paths.get(jsonFileName);
             logger.info("Writing json request file: {}", jsonFilePath.getFileName());
             try {
+                Files.createDirectories(jsonFilePath.getParent());
                 Files.write(jsonFilePath, mapper.writeValueAsString(gqlRequest).getBytes());
             } catch (IOException e) {
-                logger.error("Error writing json request file: {}", jsonFilePath.getFileName());
+                logger.error("Error writing json request file: {}", jsonFilePath.getFileName(), e);
             }
         }
     }

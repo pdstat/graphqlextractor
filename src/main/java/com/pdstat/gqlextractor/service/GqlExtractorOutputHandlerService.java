@@ -56,15 +56,15 @@ public class GqlExtractorOutputHandlerService {
                     gqlFieldWordListWriterService.writeFieldsFile(outputDirectory);
                 }
 
-                if (outputModes.contains(OutputMode.GQL)) {
+                if (outputModes.contains(OutputMode.OPERATIONS)) {
                     gqlOperationFilesWriterService.writeOperationFiles(outputDirectory);
                 }
 
-                if (outputModes.contains(OutputMode.JSON)) {
+                if (outputModes.contains(OutputMode.REQUESTS)) {
                     gqlJsonRequestFileWriterService.writeJsonRequestFiles(outputDirectory);
                 }
 
-                if (outputModes.contains(OutputMode.REPORT)) {
+                if (outputModes.contains(OutputMode.PATHS)) {
                     handleOperationsFieldSearch(outputDirectory);
                 }
             }

@@ -1,5 +1,6 @@
 package com.pdstat.gqlextractor.service;
 
+import com.pdstat.gqlextractor.Constants;
 import com.pdstat.gqlextractor.repo.GqlOperationsRepository;
 import graphql.language.AstPrinter;
 import graphql.language.Document;
@@ -25,13 +26,15 @@ public class GqlOperationFilesWriterService {
 
     public void writeOperationFiles(String outputDirectory)  {
         for (Map.Entry<String, Document> entry : gqlOperationsRepository.getGqlOperations().entrySet()) {
-            String gqlFileName = outputDirectory + "/" + entry.getKey() + ".graphql";
+            String gqlFileName = outputDirectory + "/" + Constants.Output.DIRECTORIES.OPERATIONS + "/"
+                    + entry.getKey() + ".graphql";
             Path gqlFilePath = Paths.get(gqlFileName);
             logger.info("Writing operation file: {}", gqlFilePath.getFileName());
             try {
+                Files.createDirectories(gqlFilePath.getParent());
                 Files.write(gqlFilePath, AstPrinter.printAst(entry.getValue()).getBytes());
             } catch (Exception e) {
-                logger.error("Error writing operation file: {}", gqlFilePath.getFileName());
+                logger.error("Error writing operation file: {}", gqlFilePath.getFileName(), e);
             }
         }
 

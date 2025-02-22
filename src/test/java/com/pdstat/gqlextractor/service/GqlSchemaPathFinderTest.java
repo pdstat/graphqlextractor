@@ -209,12 +209,12 @@ public class GqlSchemaPathFinderTest {
         GqlSchemaPathFinder finder = new GqlSchemaPathFinder();
         List<String> paths = finder.findFieldPaths(document, "name", 3);
         List<String> expectedPaths = List.of(
-                "name → Character → character → Query",
-                "name → Location → locationsByIds → Query",
-                "name → Location → location → Query",
-                "name → Episode → episode → Query",
-                "name → Episode → episodesByIds → Query",
-                "name → Character → charactersByIds → Query"
+                "name -> Character -> character -> Query",
+                "name -> Location -> locationsByIds -> Query",
+                "name -> Location -> location -> Query",
+                "name -> Episode -> episode -> Query",
+                "name -> Episode -> episodesByIds -> Query",
+                "name -> Character -> charactersByIds -> Query"
         );
         Assertions.assertEquals(expectedPaths, paths);
     }

@@ -26,9 +26,9 @@ public class GqlPathFinderTest {
         Assertions.assertNotNull(fieldPaths);
         Assertions.assertFalse(fieldPaths.isEmpty());
         Assertions.assertEquals(3, fieldPaths.size());
-        Assertions.assertTrue(fieldPaths.contains("distanceRemaining → batteryStatus → ebikes → stations → supply → GetSupply"));
-        Assertions.assertTrue(fieldPaths.contains("distanceRemaining → batteryStatus → scooters → stations → supply → GetSupply"));
-        Assertions.assertTrue(fieldPaths.contains("distanceRemaining → batteryStatus → rideables → supply → GetSupply"));
+        Assertions.assertTrue(fieldPaths.contains("distanceRemaining -> batteryStatus -> ebikes -> stations -> supply -> GetSupply"));
+        Assertions.assertTrue(fieldPaths.contains("distanceRemaining -> batteryStatus -> scooters -> stations -> supply -> GetSupply"));
+        Assertions.assertTrue(fieldPaths.contains("distanceRemaining -> batteryStatus -> rideables -> supply -> GetSupply"));
     }
 
 }
