@@ -1,5 +1,7 @@
 package com.pdstat.gqlextractor.repo;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import com.pdstat.gqlextractor.service.GqlMergerService;
 import graphql.language.Document;
 import graphql.language.FragmentDefinition;
@@ -75,7 +77,7 @@ public class GqlOperationsRepositoryTest {
         Document getSupplyDocument2 = new Parser().parseDocument(getSupplyQuery2);
 
         Mockito.when(gqlDocumentRepository.getGqlDocuments()).thenReturn(List.of(getSupplyDocument1, getSupplyDocument2));
-        Mockito.when(gqlMergerService.mergeGraphQLDocuments(getSupplyDocument1, getSupplyDocument2))
+        Mockito.when(gqlMergerService.mergeGraphQLDocuments(any(), any()))
                 .thenReturn(getSupplyDocument2);
 
         gqlOperationsRepository.initGqlOperations();

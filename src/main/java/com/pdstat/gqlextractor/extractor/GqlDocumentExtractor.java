@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class GqlDocumentExtractor {
@@ -78,15 +79,26 @@ public class GqlDocumentExtractor {
         return docs;
     }
 
-    private static void extractGqlLanguageStrings(List<String> documentStrings, List<Document> docs) {
+    private void extractGqlLanguageStrings(List<String> documentStrings, List<Document> docs) {
         Parser gqlParser = new Parser();
         for (String doc : documentStrings) {
             try {
+                int startIndex = getStartIndex(doc);
+                doc = doc.substring(startIndex);
                 docs.add(gqlParser.parseDocument(doc));
             } catch (InvalidSyntaxException e) {
                 logger.error("Error parsing document: {}", doc, e);
             }
         }
+    }
+
+    private int getStartIndex(String doc) {
+        int queryIndex = doc.indexOf("query ");
+        int mutationIndex = doc.indexOf("mutation ");
+        int subscriptionIndex = doc.indexOf("subscription ");
+        int fragmentIndex = doc.indexOf("fragment ");
+        List<Integer> indexList = List.of(queryIndex, mutationIndex, subscriptionIndex, fragmentIndex);
+        return indexList.stream().filter(index -> index >= 0).sorted().toList().get(0);
     }
 
     private boolean gqlLanguageString(String matchedDocumentStrings) {

@@ -28,8 +28,7 @@
                 'mutation ') > -1 || node.value.indexOf(
                 'fragment ') > -1 || node.value.indexOf(
                 'subscription ') > -1)) {
-            matchedObjects.push(node.value.trim()
-                .replaceAll('\n', ''));
+            matchedObjects.push(node.value.trim());
         }
     }
 })

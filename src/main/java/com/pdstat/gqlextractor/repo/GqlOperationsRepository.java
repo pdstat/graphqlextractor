@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 @Repository
 public class GqlOperationsRepository {
 
+    private static final Pattern FRAGMENT_SPREAD_PATTERN = Pattern.compile("FragmentSpread\\{name='([^']+)'");
+
     private final GqlDocumentRepository gqlDocumentRepository;
     private final GqlFragmentDefinitionsRepository gqlFragmentDefinitionsRepository;
     private final GqlMergerService gqlMergerService;
@@ -56,63 +58,50 @@ public class GqlOperationsRepository {
     }
 
     private Document addMissingFragmentDefinitions(Document document) {
-        if (missingFragmentDefinitions(document)) {
-            Set<String> documentFragmentSpreads = getDocumentFragmentSpreads(document);
-            Document.Builder documentBuilder = Document.newDocument();
-            for (Definition<?> definition : document.getDefinitions()) {
-                documentBuilder.definition(definition);
-            }
-            for (String fragmentSpread : documentFragmentSpreads) {
-                if (missingFragmentDefinition(document, fragmentSpread)) {
-                    FragmentDefinition fragmentDefinition = gqlFragmentDefinitionsRepository.getGqlFragmentDefinition(fragmentSpread);
-                    if (fragmentDefinition != null) {
-                        documentBuilder.definition(fragmentDefinition);
-                    }
-                }
-            }
-            return documentBuilder.build();
-        }
-        return document;
-    }
+        Set<String> addedFragments = new HashSet<>();
+        Document.Builder documentBuilder = Document.newDocument();
 
-    private boolean missingFragmentDefinitions(Document document) {
-        boolean containsFragmentSpread = document.toString().contains("FragmentSpread");
-        boolean containsFragmentDefinitions = false;
+        // Copy existing definitions
         for (Definition<?> definition : document.getDefinitions()) {
+            documentBuilder.definition(definition);
             if (definition instanceof FragmentDefinition) {
-                containsFragmentDefinitions = true;
-                break;
+                addedFragments.add(((FragmentDefinition) definition).getName());
             }
         }
-        if (!containsFragmentDefinitions && containsFragmentSpread) {
-            return true;
-        }
-        Set<String> documentFragmentSpreads = getDocumentFragmentSpreads(document);
-        for (Definition<?> definition : document.getDefinitions()) {
-            if (definition instanceof FragmentDefinition fragmentDefinition) {
-                if (!documentFragmentSpreads.contains(fragmentDefinition.getName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
+
+        // Recursively resolve missing fragment definitions
+        resolveMissingFragments(documentBuilder, addedFragments, getDocumentFragmentSpreads(document));
+
+        return documentBuilder.build();
     }
 
-    private boolean missingFragmentDefinition(Document document, String fragmentSpread) {
-        for (Definition<?> definition : document.getDefinitions()) {
-            if (definition instanceof FragmentDefinition fragmentDefinition) {
-                if (fragmentDefinition.getName().equals(fragmentSpread)) {
-                    return false;
+    private void resolveMissingFragments(Document.Builder documentBuilder, Set<String> addedFragments, Set<String> fragmentSpreads) {
+        for (String fragmentSpread : fragmentSpreads) {
+            if (!addedFragments.contains(fragmentSpread)) {
+                FragmentDefinition fragmentDefinition = gqlFragmentDefinitionsRepository.getGqlFragmentDefinition(fragmentSpread);
+                if (fragmentDefinition != null) {
+                    documentBuilder.definition(fragmentDefinition);
+                    addedFragments.add(fragmentSpread);
+
+                    // Recursively resolve dependencies of the added fragment
+                    resolveMissingFragments(documentBuilder, addedFragments, getFragmentDefinitionFragmentSpreads(fragmentDefinition));
                 }
             }
         }
-        return true;
+    }
+
+    private Set<String> getFragmentDefinitionFragmentSpreads(FragmentDefinition fragmentDefinition) {
+        Set<String> fragmentSpreads = new HashSet<>();
+        Matcher matcher = FRAGMENT_SPREAD_PATTERN.matcher(fragmentDefinition.toString());
+        while (matcher.find()) {
+            fragmentSpreads.add(matcher.group(1));
+        }
+        return fragmentSpreads;
     }
 
     private Set<String> getDocumentFragmentSpreads(Document document) {
         Set<String> fragmentSpreads = new HashSet<>();
-        Pattern fragmentSpreadPattern = Pattern.compile("FragmentSpread\\{name='([^']+)'");
-        Matcher matcher = fragmentSpreadPattern.matcher(document.toString());
+        Matcher matcher = FRAGMENT_SPREAD_PATTERN.matcher(document.toString());
         while (matcher.find()) {
             fragmentSpreads.add(matcher.group(1));
         }

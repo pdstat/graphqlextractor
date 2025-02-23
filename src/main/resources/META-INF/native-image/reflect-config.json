@@ -1,0 +1,8 @@
+[
+  {
+    "name": "com.pdstat.gqlextractor.model.GqlRequest",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  }
+]
