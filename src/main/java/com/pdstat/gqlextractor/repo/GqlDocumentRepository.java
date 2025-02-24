@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -94,7 +95,7 @@ public class GqlDocumentRepository {
             Path gqlFilePath = Paths.get(filePath);
             logger.info("Processing graphql operation file: {}", gqlFilePath.getFileName());
             try {
-                String content = new String(Files.readAllBytes(gqlFilePath));
+                String content = Files.readString(gqlFilePath);
                 gqlDocuments.add(Parser.parse(content));
             } catch (IOException | InvalidSyntaxException e) {
                 logger.error("Error reading graphql operation file: {}", gqlFilePath.getFileName(), e);
@@ -108,7 +109,7 @@ public class GqlDocumentRepository {
             Path jsFilePath = Paths.get(filePath);
             logger.info("Processing javascript file: {}", jsFilePath.getFileName());
             try {
-                String content = new String(Files.readAllBytes(jsFilePath));
+                String content = Files.readString(jsFilePath);
                 gqlDocuments.addAll(gqlDocumentExtractor.extract(content));
             } catch (IOException e) {
                 logger.error("Error reading javascript file: {}", jsFilePath.getFileName(), e);
