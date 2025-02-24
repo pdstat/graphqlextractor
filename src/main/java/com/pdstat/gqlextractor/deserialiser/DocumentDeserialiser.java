@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.language.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,18 +27,24 @@ public class DocumentDeserialiser extends JsonDeserializer<Document> {
         List<Map<String, Object>> definitionsJson = (List<Map<String, Object>>) node.get("definitions");
 
         for (Map<String, Object> def : definitionsJson) {
-            String kind = (String) def.get("kind");
+            if (namedNode(def)) {
+                String kind = (String) def.get("kind");
 
-            if ("OperationDefinition".equals(kind)) {
-                definitions.add(parseOperationDefinition(def));
-            } else if ("FragmentDefinition".equals(kind)) {
-                definitions.add(parseFragmentDefinition(def));
+                if ("OperationDefinition".equals(kind)) {
+                    definitions.add(parseOperationDefinition(def));
+                } else if ("FragmentDefinition".equals(kind)) {
+                    definitions.add(parseFragmentDefinition(def));
+                }
             }
         }
 
         return Document.newDocument()
                 .definitions(definitions)
                 .build();
+    }
+
+    private boolean namedNode(Map<String, Object> node) {
+        return node.containsKey("name") && node.get("name") != null;
     }
 
     private OperationDefinition parseOperationDefinition(Map<String, Object> json) {
@@ -65,7 +72,7 @@ public class DocumentDeserialiser extends JsonDeserializer<Document> {
     private FragmentDefinition parseFragmentDefinition(Map<String, Object> json) {
         String name = (String) ((Map<String, Object>) json.get("name")).get("value");
         TypeName typeCondition = TypeName.newTypeName(
-                (String) ((Map<String, Object>)((Map<String, Object>) json.get("typeCondition")).get("name"))
+                (String) ((Map<String, Object>) ((Map<String, Object>) json.get("typeCondition")).get("name"))
                         .get("value")).build();
         SelectionSet selectionSet = parseSelectionSet((Map<String, Object>) json.get("selectionSet"));
 
@@ -77,7 +84,7 @@ public class DocumentDeserialiser extends JsonDeserializer<Document> {
     }
 
     private VariableDefinition parseVariableDefinition(Map<String, Object> json) {
-        String name = (String) ((Map<String, Object>)((Map<String, Object>) json.get("variable")).get("name"))
+        String name = (String) ((Map<String, Object>) ((Map<String, Object>) json.get("variable")).get("name"))
                 .get("value");
         Type<?> type = parseType((Map<String, Object>) json.get("type"));
         return VariableDefinition.newVariableDefinition()
@@ -89,6 +96,8 @@ public class DocumentDeserialiser extends JsonDeserializer<Document> {
     private Type<?> parseType(Map<String, Object> json) {
         if ("NonNullType".equals(json.get("kind"))) {
             return NonNullType.newNonNullType(parseType((Map<String, Object>) json.get("type"))).build();
+        } else if ("ListType".equals(json.get("kind"))) {
+            return ListType.newListType(parseType((Map<String, Object>) json.get("type"))).build();
         } else {
             return TypeName.newTypeName((String) ((Map<String, Object>) json.get("name")).get("value")).build();
         }
@@ -174,6 +183,18 @@ public class DocumentDeserialiser extends JsonDeserializer<Document> {
             return BooleanValue.newBooleanValue((Boolean) json.get("value")).build();
         } else if ("NullValue".equals(kind)) {
             return NullValue.newNullValue().build();
+        } else if ("FloatValue".equals(kind)) {
+            return FloatValue.newFloatValue(new BigDecimal((String) json.get("value"))).build();
+        } else if ("EnumValue".equals(kind)) {
+            return EnumValue.newEnumValue((String) json.get("value")).build();
+        } else if ("ObjectValue".equals(kind)) {
+            List<ObjectField> fields = new ArrayList<>();
+            for (Map<String, Object> fieldJson : (List<Map<String, Object>>) json.get("fields")) {
+                String fieldName = (String) ((Map<String, Object>) fieldJson.get("name")).get("value");
+                Value<?> fieldValue = parseValue((Map<String, Object>) fieldJson.get("value"));
+                fields.add(ObjectField.newObjectField().name(fieldName).value(fieldValue).build());
+            }
+            return ObjectValue.newObjectValue().objectFields(fields).build();
         }
 
         return NullValue.newNullValue().build();

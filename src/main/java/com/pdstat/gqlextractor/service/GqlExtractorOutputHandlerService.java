@@ -111,6 +111,10 @@ public class GqlExtractorOutputHandlerService {
         for (String selectedOutputMode : selectedOutputModes) {
             outputModes.add(OutputMode.fromMode(selectedOutputMode));
         }
+
+        if (outputModes.isEmpty()) {
+            outputModes.add(OutputMode.REQUESTS);
+        }
         return outputModes;
     }
 

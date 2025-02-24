@@ -1,419 +1,123 @@
-# GraphQL Extractor
+# About - GraphQL Extractor
 
-Ever come across javascript files with embedded GraphQL queries and wish you could extract them into a separate file? This tool does just that.
+This is a command line tool which extracts information about GraphQL queries, mutations and subscriptions from schema introspection, remote javascript files and local javascript files.
 
-For example, given the following javascript file:
+The functionality of this tool is to extract the following information:
+- GraphQL operations (queries, mutations and subscriptions) from javascript files.
+- GraphQL requests in json format from javascript files.
+- GraphQL unique operation field names.
+- GraphQL field paths from introspection schema. Inspired by lupins 'GraphQL is the new PHP' talk (https://www.youtube.com/watch?v=tIo_t5uUK50&t=696s).
+- GraphQL field paths from operations found in javascript files.
 
-```javascript
-        function zt(e) {
-          const t = u(u({}, f), e);
-          return i.aM(Xt, t);
-        }
-        const en = o.Ps`
-    query Profile($isAccountHolder: Boolean!, $memberId: String) {
-  ...MemberAlertsFragment
-  ...MemberStatsFragment
-  ...CurrentBalanceWidgetFragment
-  ...YourInformationDataFragment
-  ...ComembersDataFragment @include(if: $isAccountHolder)
-  ...MemberSubscriptionsFragment
-  ...MemberKeyfobDataFragment
-  ...EassistPreferenceDataFragment
-  ...NotificationPreferencesDataFragment
-  ...AdsContainerDataFragment
-  ...AdditionalUserInformationFragment @include(if: $isAccountHolder)
-  member(id: $memberId) @include(if: $isAccountHolder) {
-    firstName
-    migration {
-      status
-    }
-  }
-  config {
-    profile {
-      showCurrentBalance
-    }
-    migration @include(if: $isAccountHolder) {
-      supportsMigration
-    }
-    system {
-      usesSecurityQuestions
-    }
-    membershipHistory {
-      enabled
-    }
-  }
-}
-    ${$}
-${V}
-${v}
-${j}
-${k}
-${F}
-${x}
-${q}
-${W}
-${B}
-${N}`;
+## Build and installation
+
+Build is based upon GraalVM native-image.
+
+### Prerequisites
+
+- GraalVM for JDK 17 (https://www.oracle.com/java/technologies/downloads/#graalvmjava17)
+- GraalVM js language installation
+- Microsoft Visual Studio with C++ build tools (https://visualstudio.microsoft.com/visual-cpp-build-tools/)
+
+## Usage
+
+| Arg                | Description                                                                                                                                                                                                                                   |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --help             | Outputs usage information                                                                                                                                                                                                                     |
+| --input-directory  | The directory containing the javascript files with embedded GQL strings.                                                                                                                                                                      |
+| --input-urls       | The path to a wordlist of urls to scan.                                                                                                                                                                                                       |
+| --input-schema     | URL to a graphQL endpoint with introspection enabled or the path to a file containing the json response of an introspection query.                                                                                                            |
+| --input-operations | The directory containing previously extracted .graphql operations, this avoids resource intensive Javascript AST parsing.                                                                                                                     |
+| --request-header   | Request header key/value to set in introspection requests e.g. --request-header="Api-Key1: XXXX" --request-header="Api-Key2: YYYY".                                                                                                           |
+| --search-field     | The field name paths to search for in the schema/operations.                                                                                                                                                                                  |
+| --depth            | Depth of the field path search, defaults to 10 if not specified.                                                                                                                                                                              |
+| --default-params   | The path to a json file of default parameter values. For use with 'requests' output mode                                                                                                                                                      |
+| --output-directory | The directory where the generated files will be saved.                                                                                                                                                                                        |
+| --output-mode      | The output mode for the generated files. Possible values are 'requests', 'operations', 'fields', 'paths' and 'all'. The default value is 'requests'. Multiple output modes are supported e.g. --output-mode=requests --output-mode=operations |
+
+## Examples
+
+### Schema field search
+
+To search for the possible paths to a field in the schema, use the following command:
+
+```shell
+gqlextractor --input-schema=https://rickandmortyapi.com/graphql --search-field=name --output-directory=D:\hacking\recon\rickmorty
 ```
 
-This tool will extract the GraphQL queries into separate files:
+Example screenshot of the output:
 
-```graphql
-fragment MemberAlertsFragment on Query {
-  member(id: $memberId) {
-    id
-    subscriptions {
-      id
-      endDate
-    }
-    alerts {
+![Schema field search](images/schema-fields.png)
+
+To specify the depth of the search, use the `--depth` argument:
+
+```shell
+gqlextractor --input-schema=https://rickandmortyapi.com/graphql --search-field=name --output-directory=D:\hacking\recon\rickmorty --depth=5
+```
+
+Example screenshot of the output:
+
+![Schema field search](images/schema-fields-depth.png)
+
+Paths are also saved to a text file based on the name of the field being searched for. e.g.
+
+![Schema field search](images/schema-field-file.png)
+
+
+### Javascript AST processing
+
+Don't have a schema? No problem this tool also works by processing the AST of javascript files (both locally and remotely) to extract GraphQL operations.
+
+Here are some examples of graphql operation formats that are supported
+
+Template string literals:
+```javascript
+const query = gql`
+  query {
+    user {
       id
       name
-      title
-      body
-      color
-      action {
-        text
-        href
-      }
     }
   }
-  config {
-    system {
-      giftRedemptionHelpUrl
-    }
-  }
-}
-fragment MemberStatsFragment on Query {
-  member(id: $memberId) {
-    id
-    stats {
-      numberOfRides
-    }
-  }
-}
-fragment CurrentBalanceWidgetFragment on Query {
-  member(id: $memberId) {
-    id
-    currentBalance {
-      balance {
-        amount
-        formatted
-      }
-      nextBillingDateMs
-    }
-  }
-}
-fragment YourInformationDataFragment on Query {
-  member(id: $memberId) {
-    id
-    firstName
-    lastName
-    email
-    phoneNumber
-    phoneNumberIsVerified
-    emailIsVerified
-    shippingAddress {
-      addressLine1
-      addressLine2
-      addressLine3
-      city
-      country
-      region
-      postalCode
-    }
-    memberCanAccessAccount
-  }
-  config {
-    backend
-    profile {
-      validatePhoneNumber
-    }
-  }
-}
-fragment ComembersDataFragment on Query {
-  comembers {
-    id
-    firstName
-    lastName
-    keyFob {
-      id
-    }
-  }
-  config {
-    comembers {
-      enabled
-    }
-  }
-}
-fragment MemberSubscriptionsFragment on Query {
-  member(id: $memberId) {
-    id
-    subscriptions {
-      id
-      packageId
-      chargeAccountId
-      cancellationSurvey {
-        title
-        question
-        questionDetails
-        buttonText
-        possibleAnswers {
-          id
-          text
-          detailsPlaceholderText {
-            accessibilityLabel
-            text
-          }
-        }
-      }
-      title
-      subtitle
-      status
-      offerCategory
-      canCancel
-      canPause
-      canReactivate
-      isRenewable
-      subscriptionBenefits
-      renewalType
-      businessSubscriptionOptInDetails {
-        status
-        confirmationStartDate
-        confirmationDaysLeft
-      }
-      priceLabel
-      renewalDate
-      endDate
-      corporateEmailConfirmed
-      confirmationByEmail
-      actions {
-        actionType
-        isPermitted
-        detailText
-      }
-      statusSummary {
-        title
-        body
-      }
-      promotions {
-        buttonText
-        fallbackUrl
-        title
-      }
-      renewsTo {
-        id
-        title
-        priceLabel
-      }
-      cancelMessagingDetails {
-        benefitsTitles
-      }
-      legalText
-      canBeRenewedWithDiscount
-    }
-  }
-  config {
-    system {
-      cancelInsteadOfRenewal
-    }
-  }
-}
-fragment MemberKeyfobDataFragment on Query {
-  member(id: $memberId) {
-    id
-    nfc {
-      id
-      number
-    }
-    keyFob {
-      id
-      number
-    }
-    canAddKeyFob
-    keyfobEassistPreference {
-      canChooseKeyfobMode
-      keyfobEassistUnlockMode
-    }
-    keyfobEassistAvailableOptions {
-      id
-      mode
-      priceText
-    }
-  }
-  config {
-    system {
-      usesBikeKeys
-      nfcType
-      storeUrl
-      userCanRemoveOwnAccessMethod
-    }
-  }
-}
-fragment EassistPreferenceDataFragment on Query {
-  member(id: $memberId) {
-    id
-    keyfobEassistAvailableOptions {
-      id
-      mode
-      priceText
-    }
-    keyfobEassistPreference {
-      canChooseKeyfobMode
-      keyfobEassistUnlockMode
-    }
-  }
-}
-fragment NotificationPreferencesDataFragment on Query {
-  member(id: $memberId) {
-    id
-    shippingAddress {
-      addressLine1
-      addressLine2
-      addressLine3
-      city
-      country
-      region
-      postalCode
-    }
-  }
-  config {
-    profile {
-      showLanguageSelector
-    }
-  }
-}
-fragment AdsContainerDataFragment on Query {
-  member(id: $memberId) {
-    keyFob {
-      id
-    }
-    subscriptions {
-      id
-    }
-  }
-  tcsVars {
-    skipMembershipGifting
-  }
-  config {
-    profile {
-      showHelmetAd
-      showBikeKeyAd
-      bikeKeyPromoCode
-      membershipGiftingAdPath
-    }
-    system {
-      storeUrl
-    }
-  }
-}
-fragment AdditionalUserInformationFragment on Query {
-  member(id: $memberId) {
-    id
-    dateOfBirth
-    pronoun
-    gender
-    hasSubmittedDemographicData
-    subscriptions {
-      id
-    }
-  }
-  config {
-    purchase {
-      postCollectingFields
-    }
-  }
-}
-query Profile($isAccountHolder: Boolean!, $memberId: String) {
-  ...MemberAlertsFragment
-  ...MemberStatsFragment
-  ...CurrentBalanceWidgetFragment
-  ...YourInformationDataFragment
-  ...ComembersDataFragment @include(if: $isAccountHolder)
-  ...MemberSubscriptionsFragment
-  ...MemberKeyfobDataFragment
-  ...EassistPreferenceDataFragment
-  ...NotificationPreferencesDataFragment
-  ...AdsContainerDataFragment
-  ...AdditionalUserInformationFragment @include(if: $isAccountHolder)
-  member(id: $memberId) @include(if: $isAccountHolder) {
-    firstName
-    migration {
-      status
-    }
-  }
-  config {
-    profile {
-      showCurrentBalance
-    }
-    migration @include(if: $isAccountHolder) {
-      supportsMigration
-    }
-    system {
-      usesSecurityQuestions
-    }
-    membershipHistory {
-      enabled
-    }
-  }
-}
+`;
 ```
 
-And
-
-```json
-{
-  "operationName" : "Profile",
-  "variables" : {
-    "isAccountHolder" : false,
-    "memberId" : ""
-  },
-  "query" : "fragment MemberAlertsFragment on Query {\n  member(id: $memberId) {\n    id\n    subscriptions {\n      id\n      endDate\n    }\n    alerts {\n      id\n      name\n      title\n      body\n      color\n      action {\n        text\n        href\n      }\n    }\n  }\n  config {\n    system {\n      giftRedemptionHelpUrl\n    }\n  }\n}\nfragment MemberStatsFragment on Query {\n  member(id: $memberId) {\n    id\n    stats {\n      numberOfRides\n    }\n  }\n}\nfragment CurrentBalanceWidgetFragment on Query {\n  member(id: $memberId) {\n    id\n    currentBalance {\n      balance {\n        amount\n        formatted\n      }\n      nextBillingDateMs\n    }\n  }\n}\nfragment YourInformationDataFragment on Query {\n  member(id: $memberId) {\n    id\n    firstName\n    lastName\n    email\n    phoneNumber\n    phoneNumberIsVerified\n    emailIsVerified\n    shippingAddress {\n      addressLine1\n      addressLine2\n      addressLine3\n      city\n      country\n      region\n      postalCode\n    }\n    memberCanAccessAccount\n  }\n  config {\n    backend\n    profile {\n      validatePhoneNumber\n    }\n  }\n}\nfragment ComembersDataFragment on Query {\n  comembers {\n    id\n    firstName\n    lastName\n    keyFob {\n      id\n    }\n  }\n  config {\n    comembers {\n      enabled\n    }\n  }\n}\nfragment MemberSubscriptionsFragment on Query {\n  member(id: $memberId) {\n    id\n    subscriptions {\n      id\n      packageId\n      chargeAccountId\n      cancellationSurvey {\n        title\n        question\n        questionDetails\n        buttonText\n        possibleAnswers {\n          id\n          text\n          detailsPlaceholderText {\n            accessibilityLabel\n            text\n          }\n        }\n      }\n      title\n      subtitle\n      status\n      offerCategory\n      canCancel\n      canPause\n      canReactivate\n      isRenewable\n      subscriptionBenefits\n      renewalType\n      businessSubscriptionOptInDetails {\n        status\n        confirmationStartDate\n        confirmationDaysLeft\n      }\n      priceLabel\n      renewalDate\n      endDate\n      corporateEmailConfirmed\n      confirmationByEmail\n      actions {\n        actionType\n        isPermitted\n        detailText\n      }\n      statusSummary {\n        title\n        body\n      }\n      promotions {\n        buttonText\n        fallbackUrl\n        title\n      }\n      renewsTo {\n        id\n        title\n        priceLabel\n      }\n      cancelMessagingDetails {\n        benefitsTitles\n      }\n      legalText\n      canBeRenewedWithDiscount\n    }\n  }\n  config {\n    system {\n      cancelInsteadOfRenewal\n    }\n  }\n}\nfragment MemberKeyfobDataFragment on Query {\n  member(id: $memberId) {\n    id\n    nfc {\n      id\n      number\n    }\n    keyFob {\n      id\n      number\n    }\n    canAddKeyFob\n    keyfobEassistPreference {\n      canChooseKeyfobMode\n      keyfobEassistUnlockMode\n    }\n    keyfobEassistAvailableOptions {\n      id\n      mode\n      priceText\n    }\n  }\n  config {\n    system {\n      usesBikeKeys\n      nfcType\n      storeUrl\n      userCanRemoveOwnAccessMethod\n    }\n  }\n}\nfragment EassistPreferenceDataFragment on Query {\n  member(id: $memberId) {\n    id\n    keyfobEassistAvailableOptions {\n      id\n      mode\n      priceText\n    }\n    keyfobEassistPreference {\n      canChooseKeyfobMode\n      keyfobEassistUnlockMode\n    }\n  }\n}\nfragment NotificationPreferencesDataFragment on Query {\n  member(id: $memberId) {\n    id\n    shippingAddress {\n      addressLine1\n      addressLine2\n      addressLine3\n      city\n      country\n      region\n      postalCode\n    }\n  }\n  config {\n    profile {\n      showLanguageSelector\n    }\n  }\n}\nfragment AdsContainerDataFragment on Query {\n  member(id: $memberId) {\n    keyFob {\n      id\n    }\n    subscriptions {\n      id\n    }\n  }\n  tcsVars {\n    skipMembershipGifting\n  }\n  config {\n    profile {\n      showHelmetAd\n      showBikeKeyAd\n      bikeKeyPromoCode\n      membershipGiftingAdPath\n    }\n    system {\n      storeUrl\n    }\n  }\n}\nfragment AdditionalUserInformationFragment on Query {\n  member(id: $memberId) {\n    id\n    dateOfBirth\n    pronoun\n    gender\n    hasSubmittedDemographicData\n    subscriptions {\n      id\n    }\n  }\n  config {\n    purchase {\n      postCollectingFields\n    }\n  }\n}\nquery Profile($isAccountHolder: Boolean!, $memberId: String) {\n  ...MemberAlertsFragment\n  ...MemberStatsFragment\n  ...CurrentBalanceWidgetFragment\n  ...YourInformationDataFragment\n  ...ComembersDataFragment @include(if: $isAccountHolder)\n  ...MemberSubscriptionsFragment\n  ...MemberKeyfobDataFragment\n  ...EassistPreferenceDataFragment\n  ...NotificationPreferencesDataFragment\n  ...AdsContainerDataFragment\n  ...AdditionalUserInformationFragment @include(if: $isAccountHolder)\n  member(id: $memberId) @include(if: $isAccountHolder) {\n    firstName\n    migration {\n      status\n    }\n  }\n  config {\n    profile {\n      showCurrentBalance\n    }\n    migration @include(if: $isAccountHolder) {\n      supportsMigration\n    }\n    system {\n      usesSecurityQuestions\n    }\n    membershipHistory {\n      enabled\n    }\n  }\n}"
-}
+String literals:
+```javascript
+const query = 'query { user { id name } }';
 ```
 
-The collection of JSON files can then be used as wordlists for fuzzing GraphQL endpoints.
-
-Parameter values are defaulted like so (lists of types are also supported)
-
-| Type    | Value       |
-|---------|-------------|
-| Int     | 0           |
-| Long    | 0           |
-| Float   | 0.0         |
-| String  | ""          |
-| Boolean | false       |
-| Other   | {} (Object) |
-
-It's possible to override known parameter names with default values by providing a path to a default params json file in the command line (via `--default-params`), for example:
-
-```json
-{
-  "memberId": "1234567890"
-}
+Escaped GraphQL document strings:
+```javascript
+const n=JSON.parse("{\"kind\":\"Document\",\"definitions\":[{\"kind\":\"FragmentDefinition\",\"name\":{\"kind\":\"Name\",
+\"value\":\"StoccUser\"},\"typeCondition\":{\"kind\":\"NamedType\",\"name\":{\"kind\":\"Name\",\"value\":\"StoccUser\"}},
+\"directives\":[],\"selectionSet\":{\"kind\":\"SelectionSet\",\"selections\":[{\"kind\":\"Field\",
+\"name\":{\"kind\":\"Name\",\"value\":\"__typename\"},\"arguments\":[],\"directives\":[]},{\"kind\":\"Field\",
+\"name\":{\"kind\":\"Name\",\"value\":\"id\"},\"arguments\":[],\"directives\":[]},{\"kind\":\"Field\",
+\"name\":{\"kind\":\"Name\",\"value\":\"email\"},\"arguments\":[],\"directives\":[]},{\"kind\":\"Field\",
+\"name\":{\"kind\":\"Name\",\"value\":\"firstName\"},\"arguments\":[],\"directives\":[]},{\"kind\":\"Field\",
+\"name\":{\"kind\":\"Name\",\"value\":\"lastName\"},\"arguments\":[],\"directives\":[]},{\"kind\":\"Field\",
+\"name\":{\"kind\":\"Name\",\"value\":\"country\"},\"arguments\":[],\"directives\":[]},{\"kind\":\"Field\",
+\"name\":{\"kind\":\"Name\",\"value\":\"fullName\"},\"arguments\":[],\"directives\":[]}]}}],
+\"definitionId\":\"aaafc494405155bf9a3e5c174a025db9f2db077e9a4931e58ea5d65c7a6da60c\"}")
 ```
 
-The JSON output for this would then look like the below:
-
-```json
-{
-  "operationName" : "Profile",
-  "variables" : {
-    "isAccountHolder" : false,
-    "memberId" : "1234567890"
-  },
-  "query" : "fragment MemberAlertsFragment on Query {\n  member(id: $memberId) {\n    id\n    subscriptions {\n      id\n      endDate\n    }\n    alerts {\n      id\n      name\n      title\n      body\n      color\n      action {\n        text\n        href\n      }\n    }\n  }\n  config {\n    system {\n      giftRedemptionHelpUrl\n    }\n  }\n}\nfragment MemberStatsFragment on Query {\n  member(id: $memberId) {\n    id\n    stats {\n      numberOfRides\n    }\n  }\n}\nfragment CurrentBalanceWidgetFragment on Query {\n  member(id: $memberId) {\n    id\n    currentBalance {\n      balance {\n        amount\n        formatted\n      }\n      nextBillingDateMs\n    }\n  }\n}\nfragment YourInformationDataFragment on Query {\n  member(id: $memberId) {\n    id\n    firstName\n    lastName\n    email\n    phoneNumber\n    phoneNumberIsVerified\n    emailIsVerified\n    shippingAddress {\n      addressLine1\n      addressLine2\n      addressLine3\n      city\n      country\n      region\n      postalCode\n    }\n    memberCanAccessAccount\n  }\n  config {\n    backend\n    profile {\n      validatePhoneNumber\n    }\n  }\n}\nfragment ComembersDataFragment on Query {\n  comembers {\n    id\n    firstName\n    lastName\n    keyFob {\n      id\n    }\n  }\n  config {\n    comembers {\n      enabled\n    }\n  }\n}\nfragment MemberSubscriptionsFragment on Query {\n  member(id: $memberId) {\n    id\n    subscriptions {\n      id\n      packageId\n      chargeAccountId\n      cancellationSurvey {\n        title\n        question\n        questionDetails\n        buttonText\n        possibleAnswers {\n          id\n          text\n          detailsPlaceholderText {\n            accessibilityLabel\n            text\n          }\n        }\n      }\n      title\n      subtitle\n      status\n      offerCategory\n      canCancel\n      canPause\n      canReactivate\n      isRenewable\n      subscriptionBenefits\n      renewalType\n      businessSubscriptionOptInDetails {\n        status\n        confirmationStartDate\n        confirmationDaysLeft\n      }\n      priceLabel\n      renewalDate\n      endDate\n      corporateEmailConfirmed\n      confirmationByEmail\n      actions {\n        actionType\n        isPermitted\n        detailText\n      }\n      statusSummary {\n        title\n        body\n      }\n      promotions {\n        buttonText\n        fallbackUrl\n        title\n      }\n      renewsTo {\n        id\n        title\n        priceLabel\n      }\n      cancelMessagingDetails {\n        benefitsTitles\n      }\n      legalText\n      canBeRenewedWithDiscount\n    }\n  }\n  config {\n    system {\n      cancelInsteadOfRenewal\n    }\n  }\n}\nfragment MemberKeyfobDataFragment on Query {\n  member(id: $memberId) {\n    id\n    nfc {\n      id\n      number\n    }\n    keyFob {\n      id\n      number\n    }\n    canAddKeyFob\n    keyfobEassistPreference {\n      canChooseKeyfobMode\n      keyfobEassistUnlockMode\n    }\n    keyfobEassistAvailableOptions {\n      id\n      mode\n      priceText\n    }\n  }\n  config {\n    system {\n      usesBikeKeys\n      nfcType\n      storeUrl\n      userCanRemoveOwnAccessMethod\n    }\n  }\n}\nfragment EassistPreferenceDataFragment on Query {\n  member(id: $memberId) {\n    id\n    keyfobEassistAvailableOptions {\n      id\n      mode\n      priceText\n    }\n    keyfobEassistPreference {\n      canChooseKeyfobMode\n      keyfobEassistUnlockMode\n    }\n  }\n}\nfragment NotificationPreferencesDataFragment on Query {\n  member(id: $memberId) {\n    id\n    shippingAddress {\n      addressLine1\n      addressLine2\n      addressLine3\n      city\n      country\n      region\n      postalCode\n    }\n  }\n  config {\n    profile {\n      showLanguageSelector\n    }\n  }\n}\nfragment AdsContainerDataFragment on Query {\n  member(id: $memberId) {\n    keyFob {\n      id\n    }\n    subscriptions {\n      id\n    }\n  }\n  tcsVars {\n    skipMembershipGifting\n  }\n  config {\n    profile {\n      showHelmetAd\n      showBikeKeyAd\n      bikeKeyPromoCode\n      membershipGiftingAdPath\n    }\n    system {\n      storeUrl\n    }\n  }\n}\nfragment AdditionalUserInformationFragment on Query {\n  member(id: $memberId) {\n    id\n    dateOfBirth\n    pronoun\n    gender\n    hasSubmittedDemographicData\n    subscriptions {\n      id\n    }\n  }\n  config {\n    purchase {\n      postCollectingFields\n    }\n  }\n}\nquery Profile($isAccountHolder: Boolean!, $memberId: String) {\n  ...MemberAlertsFragment\n  ...MemberStatsFragment\n  ...CurrentBalanceWidgetFragment\n  ...YourInformationDataFragment\n  ...ComembersDataFragment @include(if: $isAccountHolder)\n  ...MemberSubscriptionsFragment\n  ...MemberKeyfobDataFragment\n  ...EassistPreferenceDataFragment\n  ...NotificationPreferencesDataFragment\n  ...AdsContainerDataFragment\n  ...AdditionalUserInformationFragment @include(if: $isAccountHolder)\n  member(id: $memberId) @include(if: $isAccountHolder) {\n    firstName\n    migration {\n      status\n    }\n  }\n  config {\n    profile {\n      showCurrentBalance\n    }\n    migration @include(if: $isAccountHolder) {\n      supportsMigration\n    }\n    system {\n      usesSecurityQuestions\n    }\n    membershipHistory {\n      enabled\n    }\n  }\n}"
-}
+GraphQL documents in javascript objects:
+```javascript
+i8={kind:"Document",definitions:[{kind:"OperationDefinition",operation:"mutation",name:{kind:"Name",value:"createInstance"},
+variableDefinitions:[{kind:"VariableDefinition",variable:{kind:"Variable",name:{kind:"Name",value:"input"}},
+type:{kind:"NonNullType",type:{kind:"NamedType",name:{kind:"Name",value:"CreateInstanceInput"}}}}],
+selectionSet:{kind:"SelectionSet",selections:[{kind:"Field",name:{kind:"Name",value:"createInstance"},
+arguments:[{kind:"Argument",name:{kind:"Name",value:"input"},value:{kind:"Variable",name:{kind:"Name",value:"input"}}}],
+selectionSet:{kind:"SelectionSet",selections:[{kind:"Field",name:{kind:"Name",value:"instance"},selectionSet:{kind:"SelectionSet",
+selections:[{kind:"FragmentSpread",name:{kind:"Name",value:"instanceFull"}}]}}]}}]}},{kind:"FragmentDefinition",
+name:{kind:"Name",value:"instanceFull"},typeCondition:{kind:"NamedType",name:{kind:"Name",value:"Instance"}},
+selectionSet:{kind:"SelectionSet",selections:[{kind:"Field",name:{kind:"Name",value:"id"}},{kind:"Field",
+name:{kind:"Name",value:"name"}},{kind:"Field",name:{kind:"Name",value:"clientId"}},{kind:"Field",
+name:{kind:"Name",value:"createdAt"}}]}}]}
 ```
 
-Example usage (java) extract from local JS files:
+#### Extracting operations from javascript files
 
-```bash
-java -jar gqlextractor-1.0.0.jar --input-directory=<input_directory> --output-directory=<output_directory> [--output-mode=<output_mode> (json, graphql or all)] [--default-params=<default_params_file_path>]
-```
+This mode will extract GraphQL operations (queries, mutations and subscriptions) from all of the above formats in javascript files.
 
-Example usage (java) extract from wordlist of URLs:
-
-```bash
-java -jar gqlextractor-1.0.0.jar --input-urls=<input_urls_wordlist_path> --output-directory=<output_directory> [--output-mode=<output_mode> (json, graphql or all)] [--default-params=<default_params_file_path>]
-```
