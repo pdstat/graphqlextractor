@@ -1,4 +1,3 @@
-const matchedObjects = [];
 extractObjectFromAST = (node) => {
   if (node.type !== "ObjectExpression") return null;
 
