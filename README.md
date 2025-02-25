@@ -19,6 +19,30 @@ Build is based upon GraalVM native-image.
 - GraalVM js language installation
 - Microsoft Visual Studio with C++ build tools (https://visualstudio.microsoft.com/visual-cpp-build-tools/)
 
+#### GraalVM installation
+
+- Download and extract the GraalVM JDK 17 archive. Into a directory of your choice.
+- Set the JAVA_HOME environment variable to the GraalVM JDK 17 directory.
+- Install JS language feature for GraalVM by running the following command:
+ 
+```shell
+cd $JAVA_HOME/bin
+gu install js
+```
+
+#### Maven build
+
+- Clone the repository and navigate to the root directory.
+- Build the native image.
+
+```shell
+git clone https://github.com/pdstat/graphqlextractor.git
+cd graphqlextractor
+./mvnw -Pnative native:compile
+```
+
+- Copy the built executable in the `/target` directory to a directory in your PATH and start using the tool :).
+
 ## Usage
 
 | Arg                | Description                                                                                                                                                                                                                                   |
