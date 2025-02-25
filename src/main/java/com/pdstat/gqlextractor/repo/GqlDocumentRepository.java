@@ -5,6 +5,7 @@ import com.pdstat.gqlextractor.extractor.GqlDocumentExtractor;
 import graphql.language.Document;
 import graphql.parser.InvalidSyntaxException;
 import graphql.parser.Parser;
+import graphql.parser.ParserOptions;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +122,14 @@ public class GqlDocumentRepository {
             logger.info("Processing graphql operation file: {}", gqlFilePath.getFileName());
             try {
                 String content = Files.readString(gqlFilePath);
-                gqlDocuments.add(Parser.parse(content));
+                ParserOptions options = ParserOptions.newParserOptions()
+                        .maxTokens(Integer.MAX_VALUE) // Disable limit (or set a higher value)
+                        .build();
+
+                ParserOptions.setDefaultParserOptions(options);
+                ParserOptions.setDefaultOperationParserOptions(options);
+                Document document = Parser.parse(content);
+                gqlDocuments.add(document);
             } catch (IOException | InvalidSyntaxException e) {
                 logger.error("Error reading graphql operation file: {}", gqlFilePath.getFileName(), e);
             }

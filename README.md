@@ -61,7 +61,7 @@ Example screenshot of the output:
 
 Paths are also saved to a text file based on the name of the field being searched for. e.g.
 
-![Schema field search](images/schema-field-file.png)
+![Schema field file](images/schema-field-file.png)
 
 
 ### Javascript AST processing
@@ -117,7 +117,96 @@ name:{kind:"Name",value:"name"}},{kind:"Field",name:{kind:"Name",value:"clientId
 name:{kind:"Name",value:"createdAt"}}]}}]}
 ```
 
+See below for an example of how these GraphQL documents are successfully reconstructed into a GraphQL operation:
+
+```graphql
+mutation createInstance($input: CreateInstanceInput!) {
+  createInstance(input: $input) {
+    instance {
+      ...instanceFull
+    }
+  }
+}
+
+fragment instanceFull on Instance {
+  id
+  name
+  clientId
+  createdAt
+}
+```
+
 #### Extracting operations from javascript files
 
 This mode will extract GraphQL operations (queries, mutations and subscriptions) from all of the above formats in javascript files.
 
+```shell
+gqlextractor --input-urls=D:\hacking\recon\caido\input-urls.txt --output-directory=D:\hacking\recon\caido\graphql --output-mode=operations 
+```
+
+Operations files will be created in an `operations` directory within the output directory.
+
+![Operation files](images/operations-list.png)
+![Operation output](images/operation-output.png)
+
+### Extracting unique fields from operations
+
+**NOTE:** The remaining examples will assume operations have already been generated using the previous example. This is to avoid the resource intensive javascript AST parsing. It is however possible to use the `--input-directory` and `--input-urls` arguments to reprocess javascript files.
+
+This will extract unique fields across all operations. Useful for wordlist generation. (e.g. for fuzzing via clairvoyance)
+
+```shell
+gqlextractor --input-operations=D:\hacking\recon\caido\graphql\operations --output-directory=D:\hacking\recon\caido\graphql --output-mode=fields 
+```
+
+A unique fields file will be created in a `wordlist` directory within the output directory.
+
+![Unique fields](images/unique-field-output.png)
+
+### Extracting json requests from operations
+
+This will extract the GraphQL requests in json format from the operations. Useful for replaying requests. The collection of requests can be used with Burp via Intruder for example.
+
+```shell
+gqlextractor --input-operations=D:\hacking\recon\caido\graphql\operations --output-directory=D:\hacking\recon\caido\graphql --output-mode=requests
+```
+
+Operations files will be created in an `requests` directory within the output directory.
+
+![Requests list](images/requests-list.png)
+![Request output](images/request-output.png)
+
+#### Using default parameters
+
+If you have a set of default parameters that you would like to use with the requests, you can specify a json file containing the default parameters.
+
+This can be useful for example if you have known values of parameters and you're wanting to test IDOR's for example. (Or any other vuln type)
+
+```shell
+gqlextractor --input-operations=D:\hacking\recon\caido\graphql\operations --default-params=D:\hacking\recon\caido\default-params.json --output-directory=D:\hacking\recon\caido\graphql --output-mode=requests
+```
+
+The default parameters file should be in JSON format and contain the parameters you would like to use. For example:
+
+```json
+{
+  "input": {
+    "id": "1",
+    "name": "TestInstance"
+  }
+}
+```
+
+![Default param output](images/default-param-output.png)
+
+### Extracting field paths from operations
+
+Similar to the schema field search, this will extract the field paths from the operations. This can be useful for understanding the structure of the data returned by the operations.
+
+```shell
+gqlextractor --input-operations=D:\hacking\recon\caido\graphql\operations --output-directory=D:\hacking\recon\caido\graphql --search-field=email --output-mode=paths
+```
+
+The field paths file will be created in a `field-paths` directory within the output directory.
+
+![Field paths output](images/field-paths.png)
