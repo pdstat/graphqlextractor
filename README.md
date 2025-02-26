@@ -43,6 +43,14 @@ cd graphqlextractor
 
 - Copy the built executable in the `/target` directory to a directory in your PATH and start using the tool :).
 
+**Tip:** If you've compiled the tool on Windows to create a `.exe` file and you use WSL, create a symbolic link to the `.exe` file in a directory in your PATH. e.g.
+
+```shell
+sudo ln -s /mnt/d/hacking/gqlextractor/gqlextractor.exe /usr/bin/gqlextractor
+```
+
+It will then be possible to run the tool from the WSL terminal.
+
 ## Usage
 
 | Arg                | Description                                                                                                                                                                                                                                   |
