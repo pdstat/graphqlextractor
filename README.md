@@ -38,7 +38,7 @@ vim ~/.bashrc
 # Add the following JAVA_HOME/PATH setup to bottom of your .bashrc e.g.
 #export JAVA_HOME=/usr/lib/jdk/graalvm-jdk-17.0.14+8.1
 #export PATH=$JAVA_HOME/bin:$PATH
-sourec ~/.bashrc
+source ~/.bashrc
 ```
 
 #### Maven build
@@ -52,13 +52,7 @@ cd graphqlextractor
 ./mvnw -Pnative native:compile
 ```
 
-- Copy the built binary executable in the `/target` directory to a directory in your PATH and start using the tool :).
-
-```shell
-sudo ln -s /mnt/d/hacking/gqlextractor/gqlextractor.exe /usr/bin/gqlextractor
-```
-
-It will then be possible to run the tool from the WSL terminal.
+- Copy the built binary executable in the `/target` directory to a directory in your PATH (e.g. `/usr/bin`) and start using the tool :).
 
 ## Usage
 
