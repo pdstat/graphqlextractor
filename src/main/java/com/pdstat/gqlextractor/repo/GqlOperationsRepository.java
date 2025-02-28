@@ -70,7 +70,7 @@ public class GqlOperationsRepository {
         }
 
         // Recursively resolve missing fragment definitions
-        resolveMissingFragments(documentBuilder, addedFragments, getDocumentFragmentSpreads(document));
+        resolveMissingFragments(documentBuilder, addedFragments, getFragmentSpreads(document.toString()));
 
         return documentBuilder.build();
     }
@@ -84,24 +84,15 @@ public class GqlOperationsRepository {
                     addedFragments.add(fragmentSpread);
 
                     // Recursively resolve dependencies of the added fragment
-                    resolveMissingFragments(documentBuilder, addedFragments, getFragmentDefinitionFragmentSpreads(fragmentDefinition));
+                    resolveMissingFragments(documentBuilder, addedFragments, getFragmentSpreads(fragmentDefinition.toString()));
                 }
             }
         }
     }
 
-    private Set<String> getFragmentDefinitionFragmentSpreads(FragmentDefinition fragmentDefinition) {
+    private Set<String> getFragmentSpreads(String nodeString) {
         Set<String> fragmentSpreads = new HashSet<>();
-        Matcher matcher = FRAGMENT_SPREAD_PATTERN.matcher(fragmentDefinition.toString());
-        while (matcher.find()) {
-            fragmentSpreads.add(matcher.group(1));
-        }
-        return fragmentSpreads;
-    }
-
-    private Set<String> getDocumentFragmentSpreads(Document document) {
-        Set<String> fragmentSpreads = new HashSet<>();
-        Matcher matcher = FRAGMENT_SPREAD_PATTERN.matcher(document.toString());
+        Matcher matcher = FRAGMENT_SPREAD_PATTERN.matcher(nodeString);
         while (matcher.find()) {
             fragmentSpreads.add(matcher.group(1));
         }

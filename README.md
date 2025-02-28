@@ -15,19 +15,30 @@ Build is based upon GraalVM native-image.
 
 ### Prerequisites
 
-- GraalVM for JDK 17 (https://www.oracle.com/java/technologies/downloads/#graalvmjava17)
+- Oracle GraalVM 17.0.14+8.1 (https://www.oracle.com/java/technologies/downloads/#graalvmjava17)
 - GraalVM js language installation
 - Microsoft Visual Studio with C++ build tools (https://visualstudio.microsoft.com/visual-cpp-build-tools/)
 
 #### GraalVM installation
 
 - Download and extract the GraalVM JDK 17 archive. Into a directory of your choice.
-- Set the JAVA_HOME environment variable to the GraalVM JDK 17 directory.
 - Install JS language feature for GraalVM by running the following command:
- 
+- Set the JAVA_HOME environment variable to the GraalVM JDK 17 directory.
+
+**GraalVM Setup**
 ```shell
-cd $JAVA_HOME/bin
-gu install js
+sudo tar -xzf graalvm-jdk-17.0.14_linux-x64_bin.tar.gz
+cd /usr/lib/jdk/graalvm-jdk-17.0.14+8.1/bin
+./gu install js
+```
+
+**Environment vars setup**
+```shell
+vim ~/.bashrc
+# Add the following JAVA_HOME/PATH setup to bottom of your .bashrc e.g.
+#export JAVA_HOME=/usr/lib/jdk/graalvm-jdk-17.0.14+8.1
+#export PATH=$JAVA_HOME/bin:$PATH
+sourec ~/.bashrc
 ```
 
 #### Maven build
@@ -41,9 +52,7 @@ cd graphqlextractor
 ./mvnw -Pnative native:compile
 ```
 
-- Copy the built executable in the `/target` directory to a directory in your PATH and start using the tool :).
-
-**Tip:** If you've compiled the tool on Windows to create a `.exe` file and you use WSL, create a symbolic link to the `.exe` file in a directory in your PATH. e.g.
+- Copy the built binary executable in the `/target` directory to a directory in your PATH and start using the tool :).
 
 ```shell
 sudo ln -s /mnt/d/hacking/gqlextractor/gqlextractor.exe /usr/bin/gqlextractor
