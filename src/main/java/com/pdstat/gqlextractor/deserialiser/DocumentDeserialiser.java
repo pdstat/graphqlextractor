@@ -44,6 +44,9 @@ public class DocumentDeserialiser extends JsonDeserializer<Document> {
     }
 
     private boolean namedNode(Map<String, Object> node) {
+        if (node == null) {
+            return false;
+        }
         return node.containsKey("name") && node.get("name") != null;
     }
 
@@ -180,7 +183,7 @@ public class DocumentDeserialiser extends JsonDeserializer<Document> {
         } else if ("IntValue".equals(kind)) {
             return IntValue.newIntValue(new java.math.BigInteger(json.get("value").toString())).build();
         } else if ("BooleanValue".equals(kind)) {
-            return BooleanValue.newBooleanValue((Boolean) json.get("value")).build();
+            return BooleanValue.newBooleanValue(json.get("value") != null && (Boolean) json.get("value")).build();
         } else if ("NullValue".equals(kind)) {
             return NullValue.newNullValue().build();
         } else if ("FloatValue".equals(kind)) {
