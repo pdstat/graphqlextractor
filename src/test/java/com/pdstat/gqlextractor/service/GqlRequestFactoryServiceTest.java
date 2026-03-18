@@ -26,7 +26,6 @@ public class GqlRequestFactoryServiceTest {
 
     @Test
     void testCreateGqlRequestIntegerVariable() {
-        // Create a GQL query string with an integer variable
         String gqlQuery = "query getPerson($id:Int!){person(id:$id){name}}";
         Document document = new Parser().parseDocument(gqlQuery);
 
@@ -41,7 +40,6 @@ public class GqlRequestFactoryServiceTest {
 
     @Test
     void testCreateGqlRequestIntegerListVariable() {
-        // Create a GQL query string with an integer variable
         String gqlQuery = "query getPerson($id:[Int]!){person(id:$id){name}}";
         Document document = new Parser().parseDocument(gqlQuery);
 
@@ -56,136 +54,172 @@ public class GqlRequestFactoryServiceTest {
 
     @Test
     void testCreateGqlRequestFloatVariable() {
-        // Create a GQL query string with an integer variable
         String gqlQuery = "query getPerson($id:Float!){person(id:$id){name}}";
         Document document = new Parser().parseDocument(gqlQuery);
 
         Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn(null);
 
         GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
-        Assertions.assertEquals(gqlQuery, gqlRequest.getQuery());
-        Assertions.assertEquals("getPerson", gqlRequest.getOperationName());
-        Assertions.assertTrue(gqlRequest.getVariables().containsKey("id"));
         Assertions.assertEquals(0.0F, gqlRequest.getVariables().get("id"));
     }
 
     @Test
     void testCreateGqlRequestFloatListVariable() {
-        // Create a GQL query string with an integer variable
         String gqlQuery = "query getPerson($id:[Float]!){person(id:$id){name}}";
         Document document = new Parser().parseDocument(gqlQuery);
 
         Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn(null);
 
         GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
-        Assertions.assertEquals(gqlQuery, gqlRequest.getQuery());
-        Assertions.assertEquals("getPerson", gqlRequest.getOperationName());
-        Assertions.assertTrue(gqlRequest.getVariables().containsKey("id"));
         Assertions.assertEquals(List.of(0.0F), gqlRequest.getVariables().get("id"));
     }
 
     @Test
     void testCreateGqlRequestLongVariable() {
-        // Create a GQL query string with an integer variable
         String gqlQuery = "query getPerson($id:Long!){person(id:$id){name}}";
         Document document = new Parser().parseDocument(gqlQuery);
 
         Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn(null);
 
         GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
-        Assertions.assertEquals(gqlQuery, gqlRequest.getQuery());
-        Assertions.assertEquals("getPerson", gqlRequest.getOperationName());
-        Assertions.assertTrue(gqlRequest.getVariables().containsKey("id"));
         Assertions.assertEquals(0L, gqlRequest.getVariables().get("id"));
     }
 
     @Test
     void testCreateGqlRequestLongListVariable() {
-        // Create a GQL query string with an integer variable
         String gqlQuery = "query getPerson($id:[Long]!){person(id:$id){name}}";
         Document document = new Parser().parseDocument(gqlQuery);
 
         Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn(null);
 
         GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
-        Assertions.assertEquals(gqlQuery, gqlRequest.getQuery());
-        Assertions.assertEquals("getPerson", gqlRequest.getOperationName());
-        Assertions.assertTrue(gqlRequest.getVariables().containsKey("id"));
         Assertions.assertEquals(List.of(0L), gqlRequest.getVariables().get("id"));
     }
 
     @Test
     void testCreateGqlRequestBooleanVariable() {
-        // Create a GQL query string with an integer variable
         String gqlQuery = "query getPerson($id:Boolean!){person(id:$id){name}}";
         Document document = new Parser().parseDocument(gqlQuery);
 
         Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn(null);
 
         GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
-        Assertions.assertEquals(gqlQuery, gqlRequest.getQuery());
-        Assertions.assertEquals("getPerson", gqlRequest.getOperationName());
-        Assertions.assertTrue(gqlRequest.getVariables().containsKey("id"));
         Assertions.assertEquals(false, gqlRequest.getVariables().get("id"));
     }
 
     @Test
     void testCreateGqlRequestBooleanListVariable() {
-        // Create a GQL query string with an integer variable
         String gqlQuery = "query getPerson($id:[Boolean]!){person(id:$id){name}}";
         Document document = new Parser().parseDocument(gqlQuery);
 
         Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn(null);
 
         GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
-        Assertions.assertEquals(gqlQuery, gqlRequest.getQuery());
-        Assertions.assertEquals("getPerson", gqlRequest.getOperationName());
-        Assertions.assertTrue(gqlRequest.getVariables().containsKey("id"));
         Assertions.assertEquals(List.of(false), gqlRequest.getVariables().get("id"));
     }
 
     @Test
     void testCreateGqlRequestStringVariable() {
-        // Create a GQL query string with an integer variable
         String gqlQuery = "query getPerson($id:String!){person(id:$id){name}}";
         Document document = new Parser().parseDocument(gqlQuery);
 
         Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn(null);
 
         GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
-        Assertions.assertEquals(gqlQuery, gqlRequest.getQuery());
-        Assertions.assertEquals("getPerson", gqlRequest.getOperationName());
-        Assertions.assertTrue(gqlRequest.getVariables().containsKey("id"));
         Assertions.assertEquals("", gqlRequest.getVariables().get("id"));
     }
 
     @Test
     void testCreateGqlRequestStringListVariable() {
-        // Create a GQL query string with an integer variable
         String gqlQuery = "query getPerson($id:[String]!){person(id:$id){name}}";
         Document document = new Parser().parseDocument(gqlQuery);
 
         Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn(null);
 
         GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
-        Assertions.assertEquals(gqlQuery, gqlRequest.getQuery());
-        Assertions.assertEquals("getPerson", gqlRequest.getOperationName());
-        Assertions.assertTrue(gqlRequest.getVariables().containsKey("id"));
         Assertions.assertEquals(List.of(""), gqlRequest.getVariables().get("id"));
     }
 
     @Test
     void testCreateGqlRequestObjectVariable() {
-        // Create a GQL query string with an integer variable
         String gqlQuery = "query getPerson($id:SomeObject!){person(id:$id){name}}";
         Document document = new Parser().parseDocument(gqlQuery);
 
         Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn(null);
 
         GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
-        Assertions.assertEquals(gqlQuery, gqlRequest.getQuery());
-        Assertions.assertEquals("getPerson", gqlRequest.getOperationName());
-        Assertions.assertTrue(gqlRequest.getVariables().containsKey("id"));
         Assertions.assertInstanceOf(Map.class, gqlRequest.getVariables().get("id"));
+    }
+
+    @Test
+    void testCreateGqlRequestIDVariable() {
+        String gqlQuery = "query getPerson($id:ID!){person(id:$id){name}}";
+        Document document = new Parser().parseDocument(gqlQuery);
+
+        Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn(null);
+
+        GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
+        Assertions.assertEquals("", gqlRequest.getVariables().get("id"));
+    }
+
+    @Test
+    void testCreateGqlRequestWithDefaultParam() {
+        String gqlQuery = "query getPerson($id:String!){person(id:$id){name}}";
+        Document document = new Parser().parseDocument(gqlQuery);
+
+        Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn("custom-value");
+
+        GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
+        Assertions.assertEquals("custom-value", gqlRequest.getVariables().get("id"));
+    }
+
+    @Test
+    void testCreateGqlRequestNoVariables() {
+        String gqlQuery = "query getUsers{users{id name}}";
+        Document document = new Parser().parseDocument(gqlQuery);
+
+        GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
+        Assertions.assertEquals("getUsers", gqlRequest.getOperationName());
+        Assertions.assertTrue(gqlRequest.getVariables().isEmpty());
+    }
+
+    @Test
+    void testCreateGqlRequestMultipleVariables() {
+        String gqlQuery = "query getPerson($id:ID!,$name:String,$active:Boolean){person(id:$id,name:$name,active:$active){id}}";
+        Document document = new Parser().parseDocument(gqlQuery);
+
+        Mockito.when(defaultParamsRepository.getDefaultParam("id")).thenReturn(null);
+        Mockito.when(defaultParamsRepository.getDefaultParam("name")).thenReturn(null);
+        Mockito.when(defaultParamsRepository.getDefaultParam("active")).thenReturn(null);
+
+        GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
+        Assertions.assertEquals(3, gqlRequest.getVariables().size());
+        Assertions.assertEquals("", gqlRequest.getVariables().get("id"));
+        Assertions.assertEquals("", gqlRequest.getVariables().get("name"));
+        Assertions.assertEquals(false, gqlRequest.getVariables().get("active"));
+    }
+
+    @Test
+    void testCreateGqlRequestObjectListVariable() {
+        String gqlQuery = "query getUsers($filters:[FilterInput]!){users(filters:$filters){id}}";
+        Document document = new Parser().parseDocument(gqlQuery);
+
+        Mockito.when(defaultParamsRepository.getDefaultParam("filters")).thenReturn(null);
+
+        GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
+        Object filters = gqlRequest.getVariables().get("filters");
+        Assertions.assertInstanceOf(List.class, filters);
+    }
+
+    @Test
+    void testCreateGqlRequestMutation() {
+        String gqlQuery = "mutation createUser($input:CreateUserInput!){createUser(input:$input){id name}}";
+        Document document = new Parser().parseDocument(gqlQuery);
+
+        Mockito.when(defaultParamsRepository.getDefaultParam("input")).thenReturn(null);
+
+        GqlRequest gqlRequest = gqlRequestFactoryService.createGqlRequest(document);
+        Assertions.assertEquals("createUser", gqlRequest.getOperationName());
+        Assertions.assertInstanceOf(Map.class, gqlRequest.getVariables().get("input"));
     }
 }

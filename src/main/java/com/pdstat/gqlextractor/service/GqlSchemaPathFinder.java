@@ -42,6 +42,8 @@ public class GqlSchemaPathFinder {
      * @return List of paths to the target field
      */
     public List<String> findFieldPaths(Document document, String targetField, int maxDepth) {
+        fieldTypes.clear();
+        visitedPaths.clear();
         buildGraph(document);
         List<String> paths = new ArrayList<>();
         Queue<List<String>> queue = new LinkedList<>();

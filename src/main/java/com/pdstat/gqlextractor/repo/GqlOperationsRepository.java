@@ -54,7 +54,7 @@ public class GqlOperationsRepository {
     }
 
     private boolean documentsEqual(Document doc1, Document doc2) {
-        return doc1.toString().length() == doc2.toString().length();
+        return doc1.toString().equals(doc2.toString());
     }
 
     private Document addMissingFragmentDefinitions(Document document) {

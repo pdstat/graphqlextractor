@@ -55,7 +55,7 @@ public class GqlFragmentDefinitionsRepository {
     }
 
     private boolean documentsEqual(Document doc1, Document doc2) {
-        return doc1.toString().length() == doc2.toString().length();
+        return doc1.toString().equals(doc2.toString());
     }
 
     public FragmentDefinition getGqlFragmentDefinition(String fragmentName) {

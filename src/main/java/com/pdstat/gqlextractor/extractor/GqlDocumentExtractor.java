@@ -73,7 +73,7 @@ public class GqlDocumentExtractor {
                     docs.add(mapper.readValue(doc, Document.class));
                 }
             }
-        } else {
+        } else if(matchedDocumentStrings != null) {
             docs = mapper.readValue(matchedDocumentStrings, new TypeReference<List<Document>>() {});
         }
         return docs;
@@ -84,6 +84,10 @@ public class GqlDocumentExtractor {
         for (String doc : documentStrings) {
             try {
                 int startIndex = getStartIndex(doc);
+                if (startIndex < 0) {
+                    logger.warn("No GraphQL operation found in document: {}", doc);
+                    continue;
+                }
                 doc = doc.substring(startIndex);
                 docs.add(gqlParser.parseDocument(doc));
             } catch (InvalidSyntaxException e) {
@@ -98,7 +102,10 @@ public class GqlDocumentExtractor {
         int subscriptionIndex = doc.indexOf("subscription ");
         int fragmentIndex = doc.indexOf("fragment ");
         List<Integer> indexList = List.of(queryIndex, mutationIndex, subscriptionIndex, fragmentIndex);
-        return indexList.stream().filter(index -> index >= 0).sorted().toList().get(0);
+        return indexList.stream()
+                .filter(index -> index >= 0)
+                .min(Integer::compareTo)
+                .orElse(-1);
     }
 
     private boolean gqlLanguageString(String matchedDocumentStrings) {
@@ -107,6 +114,9 @@ public class GqlDocumentExtractor {
     }
 
     private boolean jsonStringArray(String matchedDocumentStrings) {
+        if (matchedDocumentStrings == null) {
+            return false;
+        }
         return matchedDocumentStrings.startsWith(JSON_STRING_ARRAY_PREFIX);
     }
 

@@ -3,210 +3,111 @@ package com.pdstat.gqlextractor.service;
 import graphql.language.Document;
 import graphql.parser.Parser;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 public class GqlSchemaPathFinderTest {
 
+    private GqlSchemaPathFinder finder;
+
+    private static final String SCHEMA = """
+            type Query {
+              character(id: ID!): Character
+              characters(page: Int, filter: FilterCharacter): Characters
+              charactersByIds(ids: [ID!]!): [Character]
+              location(id: ID!): Location
+              locations(page: Int, filter: FilterLocation): Locations
+              locationsByIds(ids: [ID!]!): [Location]
+              episode(id: ID!): Episode
+              episodes(page: Int, filter: FilterEpisode): Episodes
+              episodesByIds(ids: [ID!]!): [Episode]
+            }
+
+            type Character {
+              id: ID
+              name: String
+              status: String
+              species: String
+              type: String
+              gender: String
+              origin: Location
+              location: Location
+              image: String
+              episode: [Episode]!
+              created: String
+            }
+
+            type Location {
+              id: ID
+              name: String
+              type: String
+              dimension: String
+              residents: [Character]!
+              created: String
+            }
+
+            type Episode {
+              id: ID
+              name: String
+              air_date: String
+              episode: String
+              characters: [Character]!
+              created: String
+            }
+
+            type Characters {
+              info: Info
+              results: [Character]
+            }
+
+            type Info {
+              count: Int
+              pages: Int
+              next: Int
+              prev: Int
+            }
+
+            type Locations {
+              info: Info
+              results: [Location]
+            }
+
+            type Episodes {
+              info: Info
+              results: [Episode]
+            }
+
+            input FilterCharacter {
+              name: String
+              status: String
+              species: String
+              type: String
+              gender: String
+            }
+
+            input FilterLocation {
+              name: String
+              type: String
+              dimension: String
+            }
+
+            input FilterEpisode {
+              name: String
+              episode: String
+            }
+            """;
+
+    @BeforeEach
+    void setUp() {
+        finder = new GqlSchemaPathFinder();
+    }
+
     @Test
     void testFindFieldPaths() {
-        String schema = """
-                ""
-                type Query {
-                  "Get a specific character by ID"
-                  character(
-                  ""
-                  id: ID!): Character
-                  "Get the list of all characters"
-                  characters(
-                  ""
-                  page: Int
-                  ""
-                  filter: FilterCharacter): Characters
-                  "Get a list of characters selected by ids"
-                  charactersByIds(
-                  ""
-                  ids: [ID!]!): [Character]
-                  "Get a specific locations by ID"
-                  location(
-                  ""
-                  id: ID!): Location
-                  "Get the list of all locations"
-                  locations(
-                  ""
-                  page: Int
-                  ""
-                  filter: FilterLocation): Locations
-                  "Get a list of locations selected by ids"
-                  locationsByIds(
-                  ""
-                  ids: [ID!]!): [Location]
-                  "Get a specific episode by ID"
-                  episode(
-                  ""
-                  id: ID!): Episode
-                  "Get the list of all episodes"
-                  episodes(
-                  ""
-                  page: Int
-                  ""
-                  filter: FilterEpisode): Episodes
-                  "Get a list of episodes selected by ids"
-                  episodesByIds(
-                  ""
-                  ids: [ID!]!): [Episode]
-                }
-                
-                ""
-                type Character {
-                  "The id of the character."
-                  id: ID
-                  "The name of the character."
-                  name: String
-                  "The status of the character ('Alive', 'Dead' or 'unknown')."
-                  status: String
-                  "The species of the character."
-                  species: String
-                  "The type or subspecies of the character."
-                  type: String
-                  "The gender of the character ('Female', 'Male', 'Genderless' or 'unknown')."
-                  gender: String
-                  "The character's origin location"
-                  origin: Location
-                  "The character's last known location"
-                  location: Location
-                  ""\"
-                  Link to the character's image.
-                  All images are 300x300px and most are medium shots or portraits since they are intended to be used as avatars.
-                  ""\"
-                  image: String
-                  "Episodes in which this character appeared."
-                  episode: [Episode]!
-                  "Time at which the character was created in the database."
-                  created: String
-                }
-                
-                ""
-                type Location {
-                  "The id of the location."
-                  id: ID
-                  "The name of the location."
-                  name: String
-                  "The type of the location."
-                  type: String
-                  "The dimension in which the location is located."
-                  dimension: String
-                  "List of characters who have been last seen in the location."
-                  residents: [Character]!
-                  "Time at which the location was created in the database."
-                  created: String
-                }
-                
-                ""
-                type Episode {
-                  "The id of the episode."
-                  id: ID
-                  "The name of the episode."
-                  name: String
-                  "The air date of the episode."
-                  air_date: String
-                  "The code of the episode."
-                  episode: String
-                  "List of characters who have been seen in the episode."
-                  characters: [Character]!
-                  "Time at which the episode was created in the database."
-                  created: String
-                }
-                
-                ""
-                input FilterCharacter {
-                  ""
-                  name: String
-                  ""
-                  status: String
-                  ""
-                  species: String
-                  ""
-                  type: String
-                  ""
-                  gender: String
-                }
-                
-                ""
-                type Characters {
-                  ""
-                  info: Info
-                  ""
-                  results: [Character]
-                }
-                
-                ""
-                type Info {
-                  "The length of the response."
-                  count: Int
-                  "The amount of pages."
-                  pages: Int
-                  "Number of the next page (if it exists)"
-                  next: Int
-                  "Number of the previous page (if it exists)"
-                  prev: Int
-                }
-                
-                ""
-                input FilterLocation {
-                  ""
-                  name: String
-                  ""
-                  type: String
-                  ""
-                  dimension: String
-                }
-                
-                ""
-                type Locations {
-                  ""
-                  info: Info
-                  ""
-                  results: [Location]
-                }
-                
-                ""
-                input FilterEpisode {
-                  ""
-                  name: String
-                  ""
-                  episode: String
-                }
-                
-                ""
-                type Episodes {
-                  ""
-                  info: Info
-                  ""
-                  results: [Episode]
-                }
-                
-                ""
-                enum CacheControlScope {
-                  ""
-                  PUBLIC
-                  ""
-                  PRIVATE
-                }
-                
-                "The `Upload` scalar type represents a file upload."
-                scalar Upload
-                
-                ""
-                directive @cacheControl(""
-                maxAge: Int, ""
-                scope: CacheControlScope) on FIELD_DEFINITION | OBJECT | INTERFACE
-                """;
+        Document document = new Parser().parseDocument(SCHEMA);
 
-        Document document = new Parser().parseDocument(schema);
-
-        GqlSchemaPathFinder finder = new GqlSchemaPathFinder();
         List<String> paths = finder.findFieldPaths(document, "name", 3);
         List<String> expectedPaths = List.of(
                 "name -> Character -> character -> Query",
@@ -217,5 +118,108 @@ public class GqlSchemaPathFinderTest {
                 "name -> Character -> charactersByIds -> Query"
         );
         Assertions.assertEquals(expectedPaths, paths);
+    }
+
+    @Test
+    void testFindFieldPathsFieldNotFound() {
+        Document document = new Parser().parseDocument(SCHEMA);
+
+        List<String> paths = finder.findFieldPaths(document, "nonExistentField", 5);
+        Assertions.assertNotNull(paths);
+        Assertions.assertTrue(paths.isEmpty());
+    }
+
+    @Test
+    void testFindFieldPathsMaxDepthLimitsResults() {
+        Document document = new Parser().parseDocument(SCHEMA);
+
+        // Depth 1 should only find direct fields on Query
+        List<String> paths = finder.findFieldPaths(document, "name", 1);
+        Assertions.assertNotNull(paths);
+        Assertions.assertTrue(paths.isEmpty());
+    }
+
+    @Test
+    void testFindFieldPathsDirectFieldOnQuery() {
+        Document document = new Parser().parseDocument(SCHEMA);
+
+        List<String> paths = finder.findFieldPaths(document, "character", 2);
+        Assertions.assertFalse(paths.isEmpty());
+        Assertions.assertTrue(paths.contains("character -> Query"));
+    }
+
+    @Test
+    void testFindFieldPathsReusableAcrossCalls() {
+        Document document = new Parser().parseDocument(SCHEMA);
+
+        // First call
+        List<String> paths1 = finder.findFieldPaths(document, "name", 3);
+        Assertions.assertFalse(paths1.isEmpty());
+
+        // Second call with same finder instance should produce correct results
+        // (regression test for stale state bug)
+        List<String> paths2 = finder.findFieldPaths(document, "dimension", 3);
+        Assertions.assertFalse(paths2.isEmpty());
+        Assertions.assertTrue(paths2.stream().anyMatch(p -> p.contains("dimension")));
+    }
+
+    @Test
+    void testFindFieldPathsWithDifferentSchemas() {
+        Document document1 = new Parser().parseDocument(SCHEMA);
+
+        // First call with full schema
+        List<String> paths1 = finder.findFieldPaths(document1, "name", 3);
+        Assertions.assertFalse(paths1.isEmpty());
+
+        // Second call with a different, simpler schema
+        String simpleSchema = """
+                type Query {
+                  user(id: ID!): User
+                }
+                type User {
+                  id: ID
+                  username: String
+                }
+                """;
+        Document document2 = new Parser().parseDocument(simpleSchema);
+        List<String> paths2 = finder.findFieldPaths(document2, "username", 3);
+        Assertions.assertFalse(paths2.isEmpty());
+        Assertions.assertEquals(1, paths2.size());
+        Assertions.assertTrue(paths2.contains("username -> User -> user -> Query"));
+    }
+
+    @Test
+    void testFindFieldPathsEmptySchema() {
+        String emptySchema = "type Query { placeholder: String }";
+        Document document = new Parser().parseDocument(emptySchema);
+
+        List<String> paths = finder.findFieldPaths(document, "nonExistent", 5);
+        Assertions.assertNotNull(paths);
+        Assertions.assertTrue(paths.isEmpty());
+    }
+
+    @Test
+    void testFindFieldPathsWithMutationType() {
+        String schema = """
+                type Query {
+                  user(id: ID!): User
+                }
+                type Mutation {
+                  createUser(name: String!): User
+                }
+                type User {
+                  id: ID
+                  name: String
+                }
+                """;
+        Document document = new Parser().parseDocument(schema);
+
+        List<String> paths = finder.findFieldPaths(document, "name", 3);
+        Assertions.assertFalse(paths.isEmpty());
+        // Should find paths from both Query and Mutation root types
+        boolean hasQueryPath = paths.stream().anyMatch(p -> p.contains("Query"));
+        boolean hasMutationPath = paths.stream().anyMatch(p -> p.contains("Mutation"));
+        Assertions.assertTrue(hasQueryPath);
+        Assertions.assertTrue(hasMutationPath);
     }
 }
