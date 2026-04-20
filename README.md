@@ -49,6 +49,7 @@ source ~/.bashrc
 ```shell
 git clone https://github.com/pdstat/graphqlextractor.git
 cd graphqlextractor
+sudo chmod +x mvnw
 ./mvnw -Pnative native:compile
 ```
 
